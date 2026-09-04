@@ -42,3 +42,6 @@ export const REPORT_FIELDS: readonly ReportField[] = [
   { n: 3, label: 'IMMEDIATE ACTION', placeholder: 'What you did in the first hour.' },
   { n: 4, label: 'WHAT CHANGED AFTER', placeholder: 'The line that turned into a checklist item above.' },
 ] as const;
+
+export const REPORT_CLOSING_NOTE: string =
+  "Send me the four answers and I'll set this in type — no failure invented on your behalf.";

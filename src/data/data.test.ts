@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { CHAPTERS, CHAPTER_IDS } from './chapters';
 import { LEGS, STATS } from './experience';
 import { PROJECTS } from './projects';
-import { CHECKLIST, REPORT_FIELDS } from './checklist';
+import { CHECKLIST, REPORT_FIELDS, REPORT_CLOSING_NOTE } from './checklist';
 import { CONTACT, EDUCATION, CERTIFICATIONS } from './contact';
 
 describe('chapters', () => {
@@ -91,6 +91,34 @@ describe('projects', () => {
     expect(PROJECTS[1].outcome).toBe('Nothing closes without a named owner and a full trail.');
     expect(PROJECTS[2].outcome).toBe('Real-time status across both platforms from one build.');
   });
+
+  it('pins every project lede verbatim', () => {
+    expect(PROJECTS.map((p) => p.lede)).toEqual([
+      "Kenya moved to a competency-based curriculum and school software didn't follow. I built the platform around the new model instead of retrofitting grades onto it.",
+      'Fault reporting for community water points, built against UN SDG 6.1. The hard part was never the report — it was accountability after it.',
+      'Support work lives on phones, not desks. Tickets assigned, watched against SLA, and closed from wherever the agent is standing.',
+    ]);
+  });
+
+  it('pins every project bullet point verbatim', () => {
+    expect(PROJECTS.map((p) => [...p.points])).toEqual([
+      [
+        'Formative competency assessment modelled directly — no percentage gradebook in a costume.',
+        'Enrollment, timetabling and fees on one Django REST API with a React front end.',
+        'Tuned for the low-end Android devices school staff actually carry.',
+      ],
+      [
+        'Reporting usable by non-technical residents on any handset.',
+        "Triage → claim → resolve, so no fault sits in nobody's queue.",
+        'Every status change stamped with actor and timestamp — the aviation habit, applied to water.',
+      ],
+      [
+        'One Flutter client covering iOS and Android instead of two divergent codebases.',
+        'Node/Express service owning lifecycle, assignment and notifications.',
+        'SLA pressure visible in the UI before a breach, not after.',
+      ],
+    ]);
+  });
 });
 
 describe('checklist', () => {
@@ -110,6 +138,32 @@ describe('checklist', () => {
       'Handover documented',
     ]);
   });
+
+  it('pins every checklist body verbatim, including item 3\'s trailing clause', () => {
+    expect(CHECKLIST.map((c) => c.body)).toEqual([
+      "Nightly PostgreSQL dumps mean nothing until you've rebuilt from one.",
+      'Eight concurrent client schemas taught me to write the way back first.',
+      'Actor and timestamp on every state change — money, grades, faults.',
+      'Proactive patching and alerting is how five servers held 99.5%.',
+      "If it isn't usable on a low-end Android, it isn't shipped.",
+      'Architecture and deployment written down so the bus factor stays above one.',
+    ]);
+  });
+
+  it('pins every occurrence-report field label and placeholder verbatim', () => {
+    expect(REPORT_FIELDS).toEqual([
+      { n: 1, label: 'WHAT HAPPENED', placeholder: 'Awaiting your account — the one production failure worth telling.' },
+      { n: 2, label: 'HOW IT WAS DETECTED', placeholder: 'Alert, or a user telling you first? Both are honest answers.' },
+      { n: 3, label: 'IMMEDIATE ACTION', placeholder: 'What you did in the first hour.' },
+      { n: 4, label: 'WHAT CHANGED AFTER', placeholder: 'The line that turned into a checklist item above.' },
+    ]);
+  });
+
+  it('pins the occurrence-report closing note verbatim', () => {
+    expect(REPORT_CLOSING_NOTE).toBe(
+      "Send me the four answers and I'll set this in type — no failure invented on your behalf.",
+    );
+  });
 });
 
 describe('contact', () => {
@@ -125,9 +179,15 @@ describe('contact', () => {
   });
 
   it('pins education and certification copy verbatim', () => {
-    expect(EDUCATION).toHaveLength(4);
-    expect(EDUCATION[0]).toBe('MSc Computing & Information Systems — Strathmore (in progress)');
-    expect(CERTIFICATIONS).toHaveLength(2);
-    expect(CERTIFICATIONS[0]).toBe('AWS Cloud Practitioner');
+    expect(EDUCATION).toEqual([
+      'MSc Computing & Information Systems — Strathmore (in progress)',
+      'Data Science & ML — MIT',
+      'Software Development — Moringa',
+      'BSc Civil Aviation — Moi',
+    ]);
+    expect(CERTIFICATIONS).toEqual([
+      'AWS Cloud Practitioner',
+      'Cisco Junior Cyber Security Analyst (in progress)',
+    ]);
   });
 });

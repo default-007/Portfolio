@@ -10,4 +10,4 @@ export const CHAPTERS: readonly Chapter[] = [
   { id: 'ch6', hudLabel: '06 · Clearance', screenLabel: '06' },
 ] as const;
 
-export const CHAPTER_IDS = CHAPTERS.map((c) => c.id);
+export const CHAPTER_IDS: readonly string[] = CHAPTERS.map((c) => c.id);
