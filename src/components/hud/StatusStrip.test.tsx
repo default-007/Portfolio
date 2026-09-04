@@ -37,7 +37,7 @@ describe('StatusStrip', () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }) as MediaQueryList);
     render(<StatusStrip activeChapterLabel="00 · Arrival" />);
     const dot = screen.getByText('Available for assignment').parentElement?.querySelector('span:first-child > span');
-    expect(dot).toBeDefined();
+    expect(dot).not.toBeNull();
     expect(dot?.className).not.toContain('deck-blink');
   });
 });
