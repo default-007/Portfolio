@@ -1,7 +1,10 @@
 import { type RefObject } from 'react';
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { prefersReducedMotion } from '../lib/env';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function useReveal(scope: RefObject<HTMLElement | null>) {
   useGSAP(

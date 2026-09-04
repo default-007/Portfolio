@@ -8,12 +8,49 @@ gsap.registerPlugin(ScrollTrigger);
 
 const CHAR_CLASS = 'deck-char';
 
+// Characters are visible by default; the entrance is a fromTo that never
+// renders its start state until the trigger fires, so a killed or missing
+// tween can never strand the type invisible.
+function charTween(el: HTMLElement): void {
+  const chars = el.querySelectorAll<HTMLElement>(`.${CHAR_CLASS}`);
+  if (!chars.length) return;
+
+  gsap.set(chars, { clearProps: 'opacity,transform,translate', opacity: 1 });
+  gsap.fromTo(
+    chars,
+    { yPercent: 108, opacity: 0 },
+    {
+      yPercent: 0,
+      opacity: 1,
+      duration: 0.72,
+      ease: 'expo.out',
+      immediateRender: false,
+      stagger: { each: 0.014 },
+      scrollTrigger: { trigger: el, start: 'top 88%' },
+    },
+  );
+}
+
 // Wraps each word in an overflow-hidden inline-block and each character in
 // a `.deck-char` span, so the entrance tween can slide characters up from
 // underneath their own line without affecting layout. The original text is
 // preserved as an `aria-label` on the element so a screen reader still
 // hears one string instead of one per character.
+//
+// Re-entry guard mirrors design source (portfolio-v5-flight-deck.dc.html:466
+// `if (h.dataset.splitDone) return this.charTween(h, keep);`): StrictMode
+// double-invokes the mount effect in dev, and useGSAP's cleanup (context
+// .revert()) undoes GSAP-tracked properties but not split()'s raw DOM
+// mutations. Without this guard a second invocation would re-split an
+// already-split element — each existing single-character span has no
+// whitespace, so it becomes its own "word" and gets re-wrapped, doubling
+// `.deck-char` nodes and nesting the overflow-hidden containers.
 function split(el: HTMLElement): void {
+  if (el.dataset.splitDone) {
+    charTween(el);
+    return;
+  }
+
   const original = el.textContent ?? '';
   el.setAttribute('aria-label', original);
 
@@ -48,6 +85,8 @@ function split(el: HTMLElement): void {
   };
 
   walk(el);
+  el.dataset.splitDone = '1';
+  charTween(el);
 }
 
 export function useSplitText(ref: RefObject<HTMLElement | null>) {
@@ -62,27 +101,6 @@ export function useSplitText(ref: RefObject<HTMLElement | null>) {
       if (prefersReducedMotion()) return;
 
       split(el);
-
-      const chars = el.querySelectorAll<HTMLElement>(`.${CHAR_CLASS}`);
-      if (!chars.length) return;
-
-      // Characters are visible by default; the entrance is a fromTo that
-      // never renders its start state until the trigger fires, so a killed
-      // or missing tween can never strand the type invisible.
-      gsap.set(chars, { clearProps: 'opacity,transform,translate', opacity: 1 });
-      gsap.fromTo(
-        chars,
-        { yPercent: 108, opacity: 0 },
-        {
-          yPercent: 0,
-          opacity: 1,
-          duration: 0.72,
-          ease: 'expo.out',
-          immediateRender: false,
-          stagger: { each: 0.014 },
-          scrollTrigger: { trigger: el, start: 'top 88%' },
-        },
-      );
     },
     { scope: ref },
   );

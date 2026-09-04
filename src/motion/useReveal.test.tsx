@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render } from '@testing-library/react';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 const { fromTo } = vi.hoisted(() => ({ fromTo: vi.fn() }));
 vi.mock('gsap', () => ({
@@ -12,12 +12,13 @@ vi.mock('gsap', () => ({
   },
 }));
 vi.mock('gsap/ScrollTrigger', () => ({ ScrollTrigger: { update: vi.fn() } }));
-// The real useGSAP defers to a layout effect (scoping queries to committed
-// DOM) and owns cleanup. We only care that the callback runs against a
-// committed tree, so we mimic that timing with useEffect rather than
-// invoking the callback mid-render, when the scope's children don't exist yet.
+// The real useGSAP runs its callback in useIsomorphicLayoutEffect (a
+// layout effect, scoping queries to committed DOM, and owning cleanup). We
+// only care that the callback runs against a committed tree, so we mimic
+// that timing with useLayoutEffect rather than invoking the callback
+// mid-render, when the scope's children don't exist yet.
 vi.mock('@gsap/react', () => ({
-  useGSAP: (fn: () => void) => { useEffect(fn); },
+  useGSAP: (fn: () => void) => { useLayoutEffect(fn); },
 }));
 
 import { useReveal } from './useReveal';
@@ -29,13 +30,13 @@ const Probe = () => {
 };
 
 beforeEach(() => vi.clearAllMocks());
+afterEach(() => vi.unstubAllGlobals());
 
 describe('useReveal', () => {
   it('registers no tweens when reduced motion is preferred', () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }) as MediaQueryList);
     render(<Probe />);
     expect(fromTo).not.toHaveBeenCalled();
-    vi.unstubAllGlobals();
   });
 
   it('animates from a visible-safe fromTo when motion is allowed', () => {
@@ -44,6 +45,5 @@ describe('useReveal', () => {
     expect(fromTo).toHaveBeenCalled();
     const [, , to] = fromTo.mock.calls[0];
     expect(to.immediateRender).toBe(false);
-    vi.unstubAllGlobals();
   });
 });
