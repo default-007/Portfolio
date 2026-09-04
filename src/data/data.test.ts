@@ -118,6 +118,12 @@ describe('contact', () => {
     expect(email?.href).toBe('mailto:brianokola@gmail.com');
   });
 
+  it('points the DOCUMENT row at the deployed resume, not the design canvas path', () => {
+    const document = CONTACT.find((row) => row.label === 'DOCUMENT');
+    expect(document?.value).toBe('Résumé →');
+    expect(document?.href).toBe('./resume.html');
+  });
+
   it('pins education and certification copy verbatim', () => {
     expect(EDUCATION).toHaveLength(4);
     expect(EDUCATION[0]).toBe('MSc Computing & Information Systems — Strathmore (in progress)');
