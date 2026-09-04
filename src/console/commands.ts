@@ -59,8 +59,8 @@ export function parseCommand(raw: string): CommandResult {
   if (!cmd) return { kind: 'noop' };
 
   if (cmd === '?') return { kind: 'say', ...SAYS.help };
-  if (cmd in SAYS) return { kind: 'say', ...SAYS[cmd] };
-  if (cmd in ROUTES) return { kind: 'route', ...ROUTES[cmd] };
+  if (Object.prototype.hasOwnProperty.call(SAYS, cmd)) return { kind: 'say', ...SAYS[cmd] };
+  if (Object.prototype.hasOwnProperty.call(ROUTES, cmd)) return { kind: 'route', ...ROUTES[cmd] };
   if (cmd === 'clear') return { kind: 'clear' };
   if (cmd === 'sound') return { kind: 'toggleSound' };
   if (cmd === 'resume') return { kind: 'openResume' };

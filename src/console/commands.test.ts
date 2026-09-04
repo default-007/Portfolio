@@ -46,10 +46,28 @@ describe('parseCommand', () => {
     expect(parseCommand(input)).toEqual({ kind: 'route', chapterId, label });
   });
 
-  it('answers whoami, ls and stats with prose', () => {
-    for (const cmd of ['whoami', 'ls', 'stats']) {
-      expect(parseCommand(cmd).kind).toBe('say');
-    }
+  it('answers whoami with prose', () => {
+    expect(parseCommand('whoami')).toEqual({
+      kind: 'say',
+      text: 'brian otieno — full-stack engineer, nairobi. 5 yr logged. aviation before software.',
+      color: '#B8AAA0',
+    });
+  });
+
+  it('answers ls with prose', () => {
+    expect(parseCommand('ls')).toEqual({
+      kind: 'say',
+      text: '00 arrival / 01 profile / 02 cbc / 03 waterwatch / 04 ticketing / 05 checklist+incident / 06 clearance',
+      color: '#B8AAA0',
+    });
+  });
+
+  it('answers stats with prose', () => {
+    expect(parseCommand('stats')).toEqual({
+      kind: 'say',
+      text: '8 erp deployments · 99.5% uptime · 244+ institutions · 90% inside 24h sla',
+      color: '#B8AAA0',
+    });
   });
 
   it('recognises the side-effect commands', () => {
@@ -63,6 +81,19 @@ describe('parseCommand', () => {
     expect(result).toEqual({
       kind: 'say',
       text: 'unknown command: launch — try help',
+      color: '#C0603A',
+    });
+  });
+
+  it('rejects prototype chain pollution (constructor, toString)', () => {
+    expect(parseCommand('constructor')).toEqual({
+      kind: 'say',
+      text: 'unknown command: constructor — try help',
+      color: '#C0603A',
+    });
+    expect(parseCommand('toString')).toEqual({
+      kind: 'say',
+      text: 'unknown command: tostring — try help',
       color: '#C0603A',
     });
   });
