@@ -291,25 +291,27 @@ the deletion is trivially revertible:
 
 ## 12. Open items
 
-### 12.1 Résumé — blocking the `resume` command
+### 12.1 Résumé — resolved
 
-The console's `resume` command opens `Brian Otieno Resume.dc.html`. That
-file cannot currently be read: the design API returns its content as an
-opaque reference and the tool that expands such references is blocked by
-the permission classifier.
+The console's `resume` command opens the résumé. The source was retrieved
+on a second attempt and is vendored at `design/brian-otieno-resume.dc.html`
+(16.9 KB). It carries the full document: contact block, summary, six
+experience entries, a technical-skills grid, three selected projects, four
+education entries, and two certifications.
 
-Plan once unblocked: a printable `resume.html` built from the same data
-modules, plus a link to `uploads/Brian_Otieno_Resume_Tailored.pdf`.
+It is a `<doc-page>` canvas document with `margin="0.6in"` and a print
+palette (`#1f3a5f` navy, `#141414`, `#2b2b2b`, `#4a4a4a`, `#6b6b6b`,
+`#d8dde3`) entirely distinct from the flight deck's. The deliverable is a
+standalone `public/resume.html` ported from it verbatim — no PDF, since
+none exists and the page prints to one from any browser.
 
-Resolution needs one of: the retrieval approved on retry, the PDF
-supplied locally, or the résumé HTML pasted in. Everything else proceeds
-without it.
+### 12.2 Portrait asset — resolved
 
-### 12.2 Portrait asset
-
-`images/brian-speaking.png` is central to the Arrival chapter and has not
-been pulled yet; binary fetches may hit the same wall. If they do, the
-file needs to be dropped into the repo directly.
+`images/brian-speaking.png` was retrieved and decoded to `assets/brian-speaking.png`
+(506 × 627, RGBA, 192 KB). It is small — roughly 1.5× the design's 340 px
+display width — so it is adequate but not generous. A higher-resolution
+original would improve the Arrival chapter on dense displays; nothing is
+blocked without one.
 
 ### 12.3 Occurrence report is an unfilled placeholder
 

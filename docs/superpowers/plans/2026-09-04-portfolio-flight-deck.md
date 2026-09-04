@@ -2292,16 +2292,53 @@ git commit -m "Add lazy WebGL ember field with CSS aura fallback"
 
 ## Task 18: Résumé page
 
-**Blocked on spec §12.1** — the résumé source could not be retrieved. Do not start this task until Brian supplies the content. Everything before this task ships without it; the console's `resume` command and the Clearance `DOCUMENT` row both point at `./resume.html`, so until it exists they 404.
+**Unblocked.** The résumé source was retrieved and is vendored at `design/brian-otieno-resume.dc.html` (186 lines). It is the authority for every word, date, bullet and colour on this page — copy is never invented, never paraphrased, never reordered.
+
+The source is a Claude Design canvas document: a `<doc-page>` shell from `doc-page.js` with `margin="0.6in"`, wrapped in `<x-dc>`, using `<sc-if value="{{ ... }}">` conditional blocks and inline styles. It uses a **print palette entirely distinct from the flight deck's**: `#1f3a5f` navy for section rules and headings, `#141414` for titles, `#2b2b2b` body, `#4a4a4a` employer names, `#6b6b6b` dates, `#d8dde3` hairlines, white background. Fonts: `Newsreader, Georgia, serif` for the summary paragraph, `'IBM Plex Sans', sans-serif` everywhere else.
 
 **Files:**
-- Create: `public/resume.html` (or a second Vite entry point)
-- Create: `public/Brian_Otieno_Resume.pdf`
+- Create: `public/resume.html` — a standalone, self-contained static HTML file (not a Vite entry point, not React). It ships verbatim through the build because Vite copies `public/` unmodified, so `./resume.html` resolves from the cPanel document root without any routing.
 
-- [ ] **Step 1: Obtain the résumé content** — retrieval approved on retry, the PDF supplied, or the HTML pasted in.
-- [ ] **Step 2: Build a print-friendly page** using the same tokens: A4/Letter-safe margins, `@media print` rules, no fixed positioning, no viewport units.
-- [ ] **Step 3: Verify** both links resolve from a production build, and that Ctrl+P produces a clean one- or two-page document.
-- [ ] **Step 4: Commit.**
+**Interfaces:**
+- Consumes: nothing from earlier tasks. This page is deliberately standalone — it must print correctly with no JS and no bundled CSS.
+- Produces: the file that the console's `resume` command and the Clearance chapter's `DOCUMENT` row both link to as `./resume.html`.
+
+- [ ] **Step 1: Read the source.** Read `design/brian-otieno-resume.dc.html` end to end.
+
+- [ ] **Step 2: Port it to plain HTML.** Produce `public/resume.html` as a complete document (`<!doctype html>`, `<html lang="en">`, `<head>` with `<meta charset>`, `<meta name="viewport">`, `<title>Brian Otieno — Résumé</title>`, and the Google Fonts links for Newsreader and IBM Plex Sans copied from the source's `<helmet>` block).
+
+  Transform rules, applied mechanically:
+  - `<x-dc>` and `<helmet>` wrappers: drop the wrappers, hoist the `<head>` contents.
+  - `<doc-page margin="0.6in">`: replace with a plain `<main class="page">` plus CSS implementing the same page box — `@page { size: A4; margin: 0.6in; }` and, for screen, a centered `max-width: 8.27in` sheet with `padding: 0.6in`, white background, subtle shadow on a `#eceff3` screen backdrop.
+  - `<sc-if value="{{ showSummary }}">` and any other `sc-if`: **render the contained block** (the placeholder hints show these default to `true`); delete only the `sc-if` tags themselves.
+  - `<sc-for list="{{ ... }}" as="...">`: unroll to the literal repeated markup, using the source's own content for every iteration.
+  - `{{ ... }}` interpolations: replace with the literal value the source's placeholder hint gives. If a hint gives no value, the surrounding literal text in the source is the value.
+  - Inline `style="..."` attributes: keep them as-is. They are the design. Do not refactor them into classes, do not "clean them up", do not substitute Tailwind.
+  - `style-hover="..."` attributes, if any: move to a `<style>` rule in the head using a generated class; the visual result must be identical.
+
+- [ ] **Step 3: Add print rules.** In a `<style>` block: `@media print { body { background: #fff } .page { box-shadow: none; margin: 0; padding: 0; max-width: none } }`. Keep the source's existing `break-inside: avoid` on each experience entry. No `position: fixed`, no viewport units (`vh`/`vw`) anywhere in the file — both break paged output.
+
+- [ ] **Step 4: Add a back link.** A single unobtrusive link at the top, `<a href="./index.html">&larr; Back to portfolio</a>`, styled in `#1f3a5f` IBM Plex Sans at 8.4pt, inside a wrapper carrying `class="no-print"` with `@media print { .no-print { display: none } }`. This is the one element not in the source, and it exists because a standalone page with no way back is a dead end.
+
+- [ ] **Step 5: Verify the content matches.** Diff the rendered text against the source: every employer, title, date range, and bullet must appear once, in the source's order, with the source's wording. Confirm the six experience entries (Lloyd Cooper Consulting Group, Integrated Spatial Solutions, Bakpage Labs, Eclectics International, Cape Media/TV47, Kenya Civil Aviation Authority), the technical-skills grid, the three selected projects, the four education entries, and the two certifications are all present.
+
+  Note for the record: spec §12.4 flags two résumé-vs-flight-deck discrepancies (employer name, Cisco certification). On **this** page the résumé's own wording is authoritative — do not import the flight deck's variants.
+
+- [ ] **Step 6: Verify it builds and prints.** Run `npm run build`, confirm `dist/resume.html` exists byte-identical to the source file, and open `dist/index.html` and `dist/resume.html` from a static server to confirm the links resolve both ways.
+
+```bash
+npm run build
+test -f dist/resume.html && diff public/resume.html dist/resume.html && echo "resume.html ships verbatim"
+```
+
+- [ ] **Step 7: Commit.**
+
+```bash
+git add public/resume.html design/brian-otieno-resume.dc.html
+git commit -m "feat: add printable resume page"
+```
+
+**No PDF.** The plan previously called for `public/Brian_Otieno_Resume.pdf`. No PDF exists in the design project and none has been supplied, and a link to a file that 404s is worse than no link. The HTML page prints to PDF from any browser, which covers the need. Do not generate a PDF, and do not add a PDF link anywhere.
 
 ---
 
