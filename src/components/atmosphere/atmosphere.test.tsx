@@ -68,7 +68,11 @@ describe('Spotlight', () => {
     const { container } = render(<Spotlight />);
 
     expect(container).toBeEmptyDOMElement();
-    expect(addSpy).not.toHaveBeenCalledWith('pointermove', expect.any(Function), expect.anything());
+    // Filter by event name rather than matching a full argument list: a
+    // toHaveBeenCalledWith assertion also passes when the call shape changes,
+    // so it would go quiet if a regression registered the listener with no
+    // options object.
+    expect(addSpy.mock.calls.filter((c) => c[0] === 'pointermove')).toHaveLength(0);
   });
 
   it('renders its element and registers a pointermove listener when motion is allowed, removing the same listener on unmount', () => {
