@@ -35,6 +35,7 @@ export function StatusStrip({ activeChapterLabel }: { activeChapterLabel: string
       </span>
       <span className="overflow-hidden text-ellipsis text-ember">{activeChapterLabel}</span>
       <span className="flex flex-none gap-[16px]">
+        {/* Brief requires aria-hidden here even though parent has it; do not remove */}
         <span data-testid="hud-clock" aria-hidden="true">
           {clock}
         </span>

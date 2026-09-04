@@ -14,6 +14,7 @@ export function AltitudeLadder({ progress }: { progress: number }) {
       className="pointer-events-none fixed bottom-0 left-0 top-[38px] z-[60] flex w-[56px] flex-col items-center justify-center border-r border-body/8"
     >
       <div className="relative h-[52%] w-px bg-body/14">
+        {/* Relies on GSAP ScrollTrigger progress contract: bounded to [0, 1] */}
         <div
           className="absolute -left-[3px] h-[7px] w-[7px] rounded-full bg-ember shadow-[0_0_14px_3px_rgba(232,163,61,0.5)]"
           style={{ top: `${progress * 100}%` }}
