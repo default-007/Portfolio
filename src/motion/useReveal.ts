@@ -11,21 +11,30 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
     () => {
       if (prefersReducedMotion()) return;
 
-      gsap.utils.toArray<HTMLElement>('[data-anim="fade"]').forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: 'power3.out',
-            immediateRender: false,
-            overwrite: 'auto',
-            scrollTrigger: { trigger: el, start: 'top 90%' },
-          },
-        );
-      });
+      // Design 598: the scroll sweep is `section:not(#ch0)`. Chapter 00's
+      // fades belong to the load-time intro timeline below, not to
+      // ScrollTrigger. Sweeping them here as well is not merely redundant:
+      // at scroll 0 the hero is already past `top 90%`, so they fire
+      // immediately, all together, with the sweep's ease — replacing the
+      // design's staggered entrance with a flat pop on the first thing
+      // anyone sees.
+      gsap.utils
+        .toArray<HTMLElement>('section:not(#ch0) [data-anim="fade"]')
+        .forEach((el) => {
+          gsap.fromTo(
+            el,
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: 'power3.out',
+              immediateRender: false,
+              overwrite: 'auto',
+              scrollTrigger: { trigger: el, start: 'top 90%' },
+            },
+          );
+        });
 
       // Ported from design source (portfolio-v5-flight-deck.dc.html lines
       // 628-640): checklist/bullet rows marked data-anim="check" — the
@@ -109,23 +118,52 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
       // overwrite there would kill the entrance the moment the scrub is
       // created.
 
-      // Hero portrait (design 584): the intro's scale-in. It sits at
-      // position 0 of the design's intro timeline with no delay, so a
-      // standalone tween is the same animation.
+      // The arrival intro (design 582-585). Chapter 00 is the one chapter
+      // that animates on load rather than on scroll, so it is a timeline and
+      // not a ScrollTrigger: the hero photo scales in from position 0 while
+      // the chapter's fades stagger in from 0.35s. Keeping them on one
+      // timeline is what holds that offset — as two standalone tweens the
+      // relationship is only a pair of matching delays that later edits are
+      // free to drift apart.
       const heroPhoto = document.querySelector<HTMLElement>('[data-anim="hero-photo"]');
+      const introFades = gsap.utils.toArray<HTMLElement>('#ch0 [data-anim="fade"]');
+      if (heroPhoto || introFades.length > 0) {
+        const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
+
+        if (introFades.length > 0) {
+          intro.fromTo(
+            introFades,
+            { y: 22, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.9,
+              stagger: 0.1,
+              immediateRender: false,
+              overwrite: 'auto',
+            },
+            0.35,
+          );
+        }
+
+        if (heroPhoto) {
+          intro.fromTo(
+            heroPhoto,
+            { opacity: 0, scale: 1.06 },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 1.5,
+              ease: 'power2.out',
+              immediateRender: false,
+              overwrite: 'auto',
+            },
+            0,
+          );
+        }
+      }
+
       if (heroPhoto) {
-        gsap.fromTo(
-          heroPhoto,
-          { opacity: 0, scale: 1.06 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.5,
-            ease: 'power2.out',
-            immediateRender: false,
-            overwrite: 'auto',
-          },
-        );
 
         // Design 586-589: the img inside it parallaxes as ch0 scrolls away.
         // The design triggers on the '#ch0' selector; the resolved element is

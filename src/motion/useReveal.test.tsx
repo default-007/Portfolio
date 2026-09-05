@@ -2,10 +2,21 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { useLayoutEffect, useRef } from 'react';
 
-const { fromTo } = vi.hoisted(() => ({ fromTo: vi.fn() }));
+// `timelineFromTo` records the intro timeline's own fromTo calls with the
+// position parameter the caller passed. It is deliberately a separate spy
+// from `fromTo`: chapter 00 animating on load and every other chapter
+// animating on scroll is the distinction under test, and one shared spy
+// would let a tween that drifted from one to the other still pass.
+const { fromTo, timelineFromTo, timeline } = vi.hoisted(() => {
+  const timelineFromTo = vi.fn();
+  const chain = { fromTo: timelineFromTo };
+  timelineFromTo.mockReturnValue(chain);
+  return { fromTo: vi.fn(), timelineFromTo, timeline: vi.fn(() => chain) };
+});
 vi.mock('gsap', () => ({
   gsap: {
     fromTo,
+    timeline,
     set: vi.fn(),
     registerPlugin: vi.fn(),
     utils: { toArray: (sel: string) => Array.from(document.querySelectorAll(sel)) },
@@ -26,7 +37,9 @@ import { useReveal } from './useReveal';
 const Probe = () => {
   const ref = useRef<HTMLDivElement>(null);
   useReveal(ref);
-  return <div ref={ref}><p data-anim="fade">hello</p></div>;
+  // Inside a <section> that is not #ch0: the sweep is scoped to
+  // `section:not(#ch0)` because chapter 00's fades ride the intro timeline.
+  return <div ref={ref}><section><p data-anim="fade">hello</p></section></div>;
 };
 
 // Two separate parents, each with their own data-anim="check" rows — the
@@ -118,8 +131,37 @@ const allowMotion = () =>
 
 // Every call whose target is exactly `target` (an element) or exactly the
 // array `target` (order-sensitive, as the tweens build it).
+// #ch0 with two fades and a hero photo, plus a later chapter with its own
+// fade — the two paths have to be told apart, so both must be present.
+const ArrivalProbe = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  useReveal(ref);
+  return (
+    <div ref={ref}>
+      <section id="ch0">
+        <p data-anim="fade">kicker</p>
+        <h1 data-anim="fade">heading</h1>
+        <div data-anim="hero-photo" />
+      </section>
+      <section data-testid="later-section">
+        <p data-anim="fade">later</p>
+      </section>
+    </div>
+  );
+};
+
 const callsFor = (target: unknown) =>
   fromTo.mock.calls.filter(([t]) =>
+    Array.isArray(target) && Array.isArray(t)
+      ? t.length === target.length && t.every((el, i) => el === target[i])
+      : t === target,
+  );
+
+// Same matcher, against the intro timeline's calls. Returns the position
+// parameter too, since where a tween sits on that timeline is the whole
+// point of it being a timeline.
+const timelineCallsFor = (target: unknown) =>
+  timelineFromTo.mock.calls.filter(([t]) =>
     Array.isArray(target) && Array.isArray(t)
       ? t.length === target.length && t.every((el, i) => el === target[i])
       : t === target,
@@ -230,12 +272,18 @@ describe('useReveal', () => {
       allowMotion();
       const { getByTestId } = render(<FamiliesProbe />);
 
-      const [, introFrom, introTo] = callsFor(getByTestId('hero-photo'))[0]!;
+      // The scale-in rides the intro timeline at position 0 (design 584),
+      // not a standalone tween — so it is asserted on the timeline's spy,
+      // and its absence from the plain fromTo spy is asserted too.
+      const [, introFrom, introTo, introAt] =
+        timelineCallsFor(getByTestId('hero-photo'))[0]!;
       expect(introFrom).toMatchObject({ opacity: 0, scale: 1.06 });
       expect(introTo).toMatchObject({ opacity: 1, scale: 1, duration: 1.5, ease: 'power2.out' });
       expect(introTo.immediateRender).toBe(false);
       // The intro is not scroll-driven in the design — it plays on load.
       expect(introTo.scrollTrigger).toBeUndefined();
+      expect(introAt).toBe(0);
+      expect(callsFor(getByTestId('hero-photo'))).toHaveLength(0);
 
       const [, , imgTo] = callsFor(getByTestId('hero-img'))[0]!;
       expect(imgTo).toMatchObject({ yPercent: -8, ease: 'none', immediateRender: false });
@@ -243,6 +291,35 @@ describe('useReveal', () => {
       expect(imgTo.scrollTrigger.start).toBe('top top');
       expect(imgTo.scrollTrigger.end).toBe('bottom top');
       expect(imgTo.scrollTrigger.scrub).toBe(true);
+    });
+
+    // Design 583 and 598: chapter 00's fades stagger in on the load-time
+    // intro timeline, and the scroll sweep explicitly excludes #ch0. Getting
+    // this wrong is invisible in a browser — at scroll 0 the hero is already
+    // past `top 90%`, so a swept ch0 still appears; it just appears all at
+    // once, with the wrong ease and no stagger, on the first thing anyone
+    // sees. Hence the assertion is on which mechanism drives them, not on
+    // whether they end up visible.
+    it('staggers chapter 00 on the intro timeline and keeps it out of the scroll sweep', () => {
+      allowMotion();
+      const { getByTestId, getByText } = render(<ArrivalProbe />);
+      const introFades = [getByText('kicker'), getByText('heading')];
+
+      const [, from, to, at] = timelineCallsFor(introFades)[0]!;
+      expect(from).toMatchObject({ y: 22, opacity: 0 });
+      expect(to).toMatchObject({ y: 0, opacity: 1, duration: 0.9, stagger: 0.1 });
+      expect(to.immediateRender).toBe(false);
+      expect(to.scrollTrigger).toBeUndefined();
+      expect(at).toBe(0.35);
+      expect(timeline).toHaveBeenCalledWith({ defaults: { ease: 'expo.out' } });
+
+      // Nothing inside #ch0 reaches the scroll sweep...
+      for (const el of introFades) expect(callsFor(el)).toHaveLength(0);
+      // ...while a fade in a later chapter still does, so the exclusion is
+      // scoped to chapter 00 rather than having disabled the sweep outright.
+      const [, , laterTo] = callsFor(getByText('later'))[0]!;
+      expect(laterTo.scrollTrigger.start).toBe('top 90%');
+      expect(timelineCallsFor(getByTestId('later-section'))).toHaveLength(0);
     });
 
     it('scrubs each aura against its parent chapter, not against the aura', () => {
