@@ -13,8 +13,11 @@ describe('CompetencySheet', () => {
     // APPROACHING (Kimani, alone) is unique. getAllByText preserves the
     // brief's intent (the label is present) without altering the ported,
     // byte-verified design copy to make it artificially unique.
-    expect(screen.getAllByText('EXCEEDING').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('MEETING').length).toBeGreaterThan(0);
+    // Pinned to the design's real counts rather than toBeGreaterThan(0):
+    // an existence check would still pass if a regression dropped one of
+    // the two rows, which is the mistake most likely to happen here.
+    expect(screen.getAllByText('EXCEEDING')).toHaveLength(2);
+    expect(screen.getAllByText('MEETING')).toHaveLength(2);
     expect(screen.getByText('APPROACHING')).toBeInTheDocument();
   });
 
@@ -43,5 +46,29 @@ describe('TicketQueuePhone', () => {
     render(<TicketQueuePhone />);
     expect(screen.getByText(/My queue/)).toBeInTheDocument();
     expect(screen.getByText(/34m LEFT/)).toBeInTheDocument();
+  });
+});
+
+// The three mockups are decorative illustrations full of invented learner
+// names, ticket ids and map pins. The role="img" + aria-label + aria-hidden
+// contract is what stops a screen reader reading that fiction aloud as if it
+// were data, and nothing else in the suite would notice if an edit dropped it.
+describe.each([
+  [CompetencySheet, /competency/i],
+  [TriageQueue, /triage|queue|water/i],
+  [TicketQueuePhone, /ticket/i],
+])('accessibility contract', (Mockup, labelPattern) => {
+  it(`exposes ${Mockup.name} as a single labelled image with its text hidden`, () => {
+    const { container } = render(<Mockup />);
+    const img = screen.getByRole('img');
+    expect(img).toBe(container.firstElementChild);
+    expect(img.getAttribute('aria-label')).toMatch(labelPattern);
+    // Every text-bearing descendant sits inside an aria-hidden subtree.
+    const exposed = Array.from(img.querySelectorAll('*')).filter(
+      (el) =>
+        el.textContent?.trim() &&
+        !el.closest('[aria-hidden="true"]'),
+    );
+    expect(exposed).toEqual([]);
   });
 });
