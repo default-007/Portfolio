@@ -39,6 +39,10 @@ export function Clearance() {
   useSplitText(headingRef);
 
   const chapter = CHAPTERS.find((c) => c.id === 'ch6')!;
+  // The design's three-line layout puts EDUCATION[0] alone on line one and the
+  // rest on line two, so this destructuring is coupled to those arrays holding
+  // exactly the entries src/data/data.test.ts pins. Adding a certification
+  // without revisiting this block would silently drop it from the page.
   const [msc, ...restEducation] = EDUCATION;
   const [aws, cisco] = CERTIFICATIONS;
 
