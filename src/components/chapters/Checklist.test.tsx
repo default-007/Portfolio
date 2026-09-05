@@ -23,4 +23,8 @@ describe('Checklist', () => {
     expect(container.querySelector('form')).toBeNull();
     expect(container.querySelector('input')).toBeNull();
   });
+  it('marks each report field with data-field so the reveal pass can find it', () => {
+    const { container } = render(<Checklist />);
+    expect(container.querySelectorAll('[data-field="1"]')).toHaveLength(REPORT_FIELDS.length);
+  });
 });

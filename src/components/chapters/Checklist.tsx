@@ -56,7 +56,12 @@ export function Checklist() {
 
           <div className="flex flex-col gap-[13px] px-4 py-[15px]">
             {REPORT_FIELDS.map((field, i) => (
-              <div key={field.n}>
+              // data-field is load-bearing, not a copy-paste artifact: the
+              // design's script reveals these by querying [data-field]
+              // (design line 613) and clears them in the initial gsap.set
+              // (line 540). Dropping it would silently leave the report
+              // panel out of the reveal pass.
+              <div key={field.n} data-field="1">
                 <div className="mb-[5px] font-mono text-[9px] tracking-[0.14em] text-dim-2">
                   <span>{field.n} · </span>
                   <span>{field.label}</span>
