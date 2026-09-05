@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from 'react';
 import { useSplitText } from '../../motion/useSplitText';
 import { CHAPTERS } from '../../data/chapters';
-import { PROJECTS, type Project } from '../../data/projects';
+import { type Project } from '../../data/projects';
 
 // Leg-label accent colour per chapter (design source
 // portfolio-v5-flight-deck.dc.html lines 124, 165, 204): ch2 rust, ch3 go,
@@ -40,9 +40,14 @@ export function CaseStudy({
   const headingRef = useRef<HTMLHeadingElement>(null);
   useSplitText(headingRef);
 
-  const chapter = CHAPTERS.find((c) => c.id === project.id)!;
-  const index = PROJECTS.findIndex((p) => p.id === project.id);
-  const raised = index % 2 === 1;
+  const chapterIndex = CHAPTERS.findIndex((c) => c.id === project.id);
+  const chapter = CHAPTERS[chapterIndex];
+  // The design darkens alternate chapters across the whole page — ch1, ch3
+  // and ch5 carry background:#0D0A09 (lines 103, 163, 240) and the rest do
+  // not. Keying on the chapter's index in CHAPTERS states that page-wide
+  // rule; keying on the index within PROJECTS would land on ch3 too, but
+  // only by coincidence, and would say nothing true about the design.
+  const raised = chapterIndex % 2 === 1;
 
   const text = (
     <div>

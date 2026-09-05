@@ -49,4 +49,17 @@ describe('CaseStudy', () => {
     expect(screen.getByText(p.leg).className).toContain(accent);
     expect(screen.getByText(p.lede).className).toContain(measure);
   });
+  // The design darkens alternate chapters page-wide (ch1/ch3/ch5), so among
+  // the case studies only ch3 is raised. Pinned because the derivation is a
+  // one-line parity check that would go wrong silently.
+  it.each([
+    ['ch2', false],
+    ['ch3', true],
+    ['ch4', false],
+  ])('raises the background for %s only when the design darkens it', (id, raised) => {
+    const p = PROJECTS.find((x) => x.id === id)!;
+    const { container } = render(<CaseStudy project={p}><div /></CaseStudy>);
+    const cls = container.querySelector('section')!.className;
+    expect(cls.includes('bg-deck-raised')).toBe(raised);
+  });
 });
