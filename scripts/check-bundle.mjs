@@ -93,6 +93,41 @@ if (resume) {
   }
 }
 
+// The .htaccess is the one shipped file no test can cover: it executes on
+// someone else's Apache. An unguarded Header directive does not degrade there
+// — Apache rejects it as "Invalid command 'Header'" and serves 500 for every
+// request under the directory — so on a free cPanel host without mod_headers
+// the whole site goes dark. Verified against Apache 2.4.58 both ways.
+const htaccessPath = join(dist, '.htaccess');
+let htaccess;
+try {
+  htaccess = readFileSync(htaccessPath, 'utf8');
+} catch {
+  failures.push('dist/.htaccess is missing; the deploy has no cache or security config.');
+}
+
+if (htaccess) {
+  // Walks the file tracking whether we are inside a mod_headers guard, rather
+  // than pattern-matching, so a Header directive nested any depth down inside
+  // the guard (as the FilesMatch one is) still reads as covered.
+  let depth = 0;
+  let guardedAt = null;
+  htaccess.split('\n').forEach((line, i) => {
+    const text = line.trim();
+    if (/^<IfModule\s+mod_headers\.c>/.test(text) && guardedAt === null) guardedAt = depth;
+    if (/^<[A-Za-z]/.test(text)) depth += 1;
+    else if (/^<\//.test(text)) {
+      depth -= 1;
+      if (guardedAt !== null && depth === guardedAt) guardedAt = null;
+    } else if (/^Header\s/.test(text) && guardedAt === null) {
+      failures.push(
+        `dist/.htaccess line ${i + 1} has a Header directive outside <IfModule mod_headers.c>, ` +
+          'which 500s the whole site on a host without mod_headers.',
+      );
+    }
+  });
+}
+
 if (failures.length > 0) {
   console.error('Bundle check failed:');
   for (const f of failures) console.error(`  - ${f}`);
@@ -100,3 +135,4 @@ if (failures.length > 0) {
 }
 console.log(`Bundle check passed: three is lazy-only (${preloaded.length} modulepreload(s): ${preloaded.join(', ')})`);
 console.log('Resume check passed: dist/resume.html is complete and print-safe.');
+console.log('Htaccess check passed: every Header directive is guarded by mod_headers.');
