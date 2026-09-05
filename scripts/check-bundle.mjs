@@ -46,9 +46,57 @@ if (!entry) {
   }
 }
 
+// resume.html is a hand-written static file that Vite copies through
+// untouched, so it is invisible to the unit suite: the two tests that mention
+// it (data.test.ts, Console.test.tsx) only assert the string './resume.html'
+// is the link target, and pass just as happily if the file is missing, empty,
+// or still full of unresolved Claude Design template syntax. It is also the
+// owner's hiring document. Assert its shape here, where build output is
+// already being checked.
+const resumePath = join(dist, 'resume.html');
+let resume = '';
+try {
+  resume = readFileSync(resumePath, 'utf8');
+} catch {
+  failures.push('dist/resume.html is missing — the console\'s `resume` command and the Clearance DOCUMENT row both link to it.');
+}
+
+if (resume) {
+  // Unresolved canvas-document syntax would render as literal junk on the page.
+  for (const residue of ['<sc-if', '<sc-for', '{{', '<x-dc', '<doc-page']) {
+    if (resume.includes(residue)) {
+      failures.push(`dist/resume.html still contains unresolved template syntax: ${residue}`);
+    }
+  }
+
+  // Both break paged output, which is the entire point of this page.
+  if (/position\s*:\s*fixed/.test(resume)) {
+    failures.push('dist/resume.html uses position:fixed, which breaks printing.');
+  }
+  if (/\d(vh|vw)\b/.test(resume)) {
+    failures.push('dist/resume.html uses vh/vw units, which break printing.');
+  }
+
+  // A dropped sc-if block or a truncated port would silently lose an employer.
+  const employers = [
+    'Lloyd Cooper Consulting Group',
+    'Integrated Spatial Solutions',
+    'Bakpage Labs',
+    'Eclectics International',
+    'Cape Media',
+    'Kenya Civil Aviation Authority',
+  ];
+  for (const employer of employers) {
+    if (!resume.includes(employer)) {
+      failures.push(`dist/resume.html is missing the employer "${employer}".`);
+    }
+  }
+}
+
 if (failures.length > 0) {
   console.error('Bundle check failed:');
   for (const f of failures) console.error(`  - ${f}`);
   process.exit(1);
 }
 console.log(`Bundle check passed: three is lazy-only (${preloaded.length} modulepreload(s): ${preloaded.join(', ')})`);
+console.log('Resume check passed: dist/resume.html is complete and print-safe.');
