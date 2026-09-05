@@ -20,5 +20,14 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test-setup.ts'],
+    // App.test.tsx (Task 16) is the first test to mount the full tree —
+    // real ScrollTrigger.create() per chapter section, a real Lenis
+    // instance, and useSplitText's per-character DOM walk all run
+    // synchronously on render. Under parallel worker contention the
+    // default 5000ms timeout is occasionally too tight even though the
+    // test itself does no async waiting; this headroom is for CI/sandbox
+    // scheduling variance, not a hint that the component is slow in a
+    // browser.
+    testTimeout: 15000,
   },
 });
