@@ -35,4 +35,18 @@ describe('CaseStudy', () => {
     const children = Array.from(container.querySelector('section')!.children);
     expect(children[0].querySelector('[data-testid="mockup"]')).toBeTruthy();
   });
+  // The design gives each case study its own leg-label accent and its own
+  // lede measure (520px for ch2, 500px for ch3/ch4). Pinning both per
+  // chapter: a single averaged constant would silently redesign two of the
+  // three sections and nothing else in the suite would notice.
+  it.each([
+    ['ch2', 'text-rust', 'max-w-[520px]'],
+    ['ch3', 'text-go', 'max-w-[500px]'],
+    ['ch4', 'text-horizon', 'max-w-[500px]'],
+  ])('gives %s its own accent and lede measure', (id, accent, measure) => {
+    const p = PROJECTS.find((x) => x.id === id)!;
+    render(<CaseStudy project={p}><div /></CaseStudy>);
+    expect(screen.getByText(p.leg).className).toContain(accent);
+    expect(screen.getByText(p.lede).className).toContain(measure);
+  });
 });

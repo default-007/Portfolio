@@ -4,19 +4,24 @@ import { CHAPTERS } from '../../data/chapters';
 import { PROJECTS, type Project } from '../../data/projects';
 
 // Leg-label accent colour per chapter (design source
-// portfolio-v5-flight-deck.dc.html lines 124, 203, 222): ch2 uses rust and
-// ch3 uses go, both existing @theme tokens. ch4's #8A9FB8 has no token, but
-// it is the exact hex already used as a raw literal for the "Product" leg
-// gradient in src/data/experience.ts, so it is applied the same way here
-// rather than inventing a new token for a single one-off accent. Project
-// carries no accent field (Task 4's interface is fixed), so this is keyed
-// on the chapter's own immutable id.
-const LEG_ACCENT_CLASS: Partial<Record<Project['id'], string>> = {
+// portfolio-v5-flight-deck.dc.html lines 124, 165, 204): ch2 rust, ch3 go,
+// ch4 #8A9FB8 — now the --color-horizon token, since a raw hex literal in a
+// component violates the project's colour rule even when the same hex also
+// appears as data in src/data/experience.ts. Project carries no accent
+// field, so this is keyed on the chapter's own immutable id.
+const LEG_ACCENT_CLASS: Record<Project['id'], string> = {
   ch2: 'text-rust',
   ch3: 'text-go',
+  ch4: 'text-horizon',
 };
-const LEG_ACCENT_HEX: Partial<Record<Project['id'], string>> = {
-  ch4: '#8A9FB8',
+
+// The design gives ch2's lede a wider measure than the other two (520px at
+// line 127 against 500px at 192 and 206). Values are ported verbatim, so
+// this is keyed per chapter rather than averaged to one constant.
+const LEDE_MAX_WIDTH: Record<Project['id'], string> = {
+  ch2: 'max-w-[520px]',
+  ch3: 'max-w-[500px]',
+  ch4: 'max-w-[500px]',
 };
 
 // Ported from design source (portfolio-v5-flight-deck.dc.html lines
@@ -43,10 +48,7 @@ export function CaseStudy({
     <div>
       <div
         data-anim="fade"
-        className={`mb-5 font-mono text-[10.5px] uppercase tracking-[0.18em] ${
-          LEG_ACCENT_CLASS[project.id] ?? ''
-        }`}
-        style={LEG_ACCENT_HEX[project.id] ? { color: LEG_ACCENT_HEX[project.id] } : undefined}
+        className={`mb-5 font-mono text-[10.5px] uppercase tracking-[0.18em] ${LEG_ACCENT_CLASS[project.id]}`}
       >
         {project.leg}
       </div>
@@ -61,7 +63,7 @@ export function CaseStudy({
 
       <p
         data-anim="fade"
-        className="m-0 mb-[26px] max-w-[500px] text-[16.5px] leading-[1.65] text-muted [text-wrap:pretty]"
+        className={`m-0 mb-[26px] ${LEDE_MAX_WIDTH[project.id]} text-[16.5px] leading-[1.65] text-muted [text-wrap:pretty]`}
       >
         {project.lede}
       </p>
