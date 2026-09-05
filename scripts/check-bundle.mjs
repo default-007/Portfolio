@@ -14,6 +14,7 @@
 // silently, so the build asserts it instead of trusting it.
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { findUnguardedHeaderLines } from './htaccessGuard.mjs';
 
 const dist = 'dist';
 const assets = join(dist, 'assets');
@@ -107,25 +108,12 @@ try {
 }
 
 if (htaccess) {
-  // Walks the file tracking whether we are inside a mod_headers guard, rather
-  // than pattern-matching, so a Header directive nested any depth down inside
-  // the guard (as the FilesMatch one is) still reads as covered.
-  let depth = 0;
-  let guardedAt = null;
-  htaccess.split('\n').forEach((line, i) => {
-    const text = line.trim();
-    if (/^<IfModule\s+mod_headers\.c>/.test(text) && guardedAt === null) guardedAt = depth;
-    if (/^<[A-Za-z]/.test(text)) depth += 1;
-    else if (/^<\//.test(text)) {
-      depth -= 1;
-      if (guardedAt !== null && depth === guardedAt) guardedAt = null;
-    } else if (/^Header\s/.test(text) && guardedAt === null) {
-      failures.push(
-        `dist/.htaccess line ${i + 1} has a Header directive outside <IfModule mod_headers.c>, ` +
-          'which 500s the whole site on a host without mod_headers.',
-      );
-    }
-  });
+  for (const line of findUnguardedHeaderLines(htaccess)) {
+    failures.push(
+      `dist/.htaccess line ${line} has a Header directive outside <IfModule mod_headers.c>, ` +
+        'which 500s the whole site on a host without mod_headers.',
+    );
+  }
 }
 
 if (failures.length > 0) {
