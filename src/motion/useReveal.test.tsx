@@ -112,6 +112,32 @@ describe('useReveal', () => {
       expect(to.immediateRender).toBe(false);
     });
 
+    // The bug this guards against shipped once: omitting `trigger` looks like
+    // it defers to the tween's first target, but GSAP resolves it to null and
+    // ScrollTrigger's position math then substitutes document.body, whose top
+    // never moves — so `top 92%` fires at scroll position 0 and the rows are
+    // already revealed before the reader reaches them. Every assertion above
+    // passes either way, because none of them read scrollTrigger.
+    it('triggers each group on its own first row, never on an implicit default', () => {
+      vi.stubGlobal('matchMedia', () => ({ matches: false }) as MediaQueryList);
+      const { getByTestId } = render(<CheckProbe />);
+      const rowsOf = (el: HTMLElement) =>
+        Array.from(el.querySelectorAll('[data-anim="check"]'));
+
+      for (const id of ['group-a', 'group-b']) {
+        const rows = rowsOf(getByTestId(id));
+        const calls = fromTo.mock.calls.filter(
+          ([target]) => Array.isArray(target) && (target[0] === rows[0] || target[0] === rows[0].firstElementChild),
+        );
+        // Both the row tween and the glyph tween for this group.
+        expect(calls).toHaveLength(2);
+        for (const [, , to] of calls) {
+          expect(to.scrollTrigger.trigger).toBe(rows[0]);
+          expect(to.scrollTrigger.start).toBe('top 92%');
+        }
+      }
+    });
+
     it('registers no check tweens when reduced motion is preferred', () => {
       vi.stubGlobal('matchMedia', () => ({ matches: true }) as MediaQueryList);
       render(<CheckProbe />);

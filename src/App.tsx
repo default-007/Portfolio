@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type ComponentType } from 'react';
 import { Grain } from './components/atmosphere/Grain';
 import { Vignette } from './components/atmosphere/Vignette';
 import { Spotlight } from './components/atmosphere/Spotlight';
@@ -17,14 +17,17 @@ import { Clearance } from './components/chapters/Clearance';
 import { useSmoothScroll } from './motion/useSmoothScroll';
 import { useReveal } from './motion/useReveal';
 import { useChapterTracking } from './motion/useChapterTracking';
-import { PROJECTS } from './data/projects';
+import { PROJECTS, type Project } from './data/projects';
 import { CHAPTERS } from './data/chapters';
 
-const MOCKUPS = {
+// Typed against PROJECTS' own id union rather than left inferred: a project
+// added to PROJECTS without a mockup here is then a compile error instead of
+// an `undefined` component that only fails when that chapter renders.
+const MOCKUPS: Record<Project['id'], ComponentType> = {
   ch2: CompetencySheet,
   ch3: TriageQueue,
   ch4: TicketQueuePhone,
-} as const;
+};
 
 export default function App() {
   const scope = useRef<HTMLDivElement>(null);

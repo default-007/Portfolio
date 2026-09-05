@@ -165,6 +165,18 @@ describe('Console', () => {
       await user.keyboard('j');
       expect(onRoute).toHaveBeenCalledWith('ch4');
     });
+
+    // An id outside CHAPTER_IDS must leave the cursor alone rather than
+    // resolve to indexOf's -1 and snap navigation back to the first chapter.
+    it('ignores an unrecognised activeId instead of resetting to chapter 0', async () => {
+      const user = userEvent.setup();
+      const onRoute = vi.fn();
+      const { rerender } = render(<Console onRoute={onRoute} activeId="ch3" />);
+      rerender(<Console onRoute={onRoute} activeId="ch99" />);
+
+      await user.keyboard('j');
+      expect(onRoute).toHaveBeenCalledWith('ch4');
+    });
   });
 
   it('removes the keydown listener it added on unmount', () => {

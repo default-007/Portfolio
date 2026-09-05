@@ -43,11 +43,14 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
       });
 
       checkGroups.forEach((items) => {
-        // The design's first rev() call passes no explicit trigger, which
-        // in its helper means the tween's own first element. GSAP's
-        // ScrollTrigger does the same when `trigger` is left unset on a
-        // tween whose target is an element array — it falls back to the
-        // first target — so `trigger` is omitted here too, to match.
+        // The design's rev() helper resolves its own default —
+        // `trigger: o.trigger || arr[0]` (design source line 527) — so a
+        // call that passes no trigger still ends up triggered on the
+        // group's first row. GSAP has no such fallback: leaving `trigger`
+        // unset yields null, and ScrollTrigger's position math then
+        // substitutes document.body, whose top never moves, firing
+        // `top 92%` at scroll position 0. The trigger is therefore passed
+        // explicitly, exactly as the glyph tween below already does.
         gsap.fromTo(
           items,
           { opacity: 0, x: -10 },
@@ -59,7 +62,7 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
             ease: 'power2.out',
             immediateRender: false,
             overwrite: 'auto',
-            scrollTrigger: { start: 'top 92%' },
+            scrollTrigger: { trigger: items[0], start: 'top 92%' },
           },
         );
 
