@@ -56,17 +56,20 @@ export function Checklist() {
 
           <div className="flex flex-col gap-[13px] px-4 py-[15px]">
             {REPORT_FIELDS.map((field, i) => (
-              // data-field is load-bearing, not a copy-paste artifact: the
-              // design's script reveals these by querying [data-field]
-              // (design line 613) and clears them in the initial gsap.set
-              // (line 540). Dropping it would silently leave the report
-              // panel out of the reveal pass.
-              <div key={field.n} data-field="1">
+              <div key={field.n}>
                 <div className="mb-[5px] font-mono text-[9px] tracking-[0.14em] text-dim-2">
                   <span>{field.n} · </span>
                   <span>{field.label}</span>
                 </div>
+                {/* data-field is a hook, not a copy-paste artifact: the
+                    design's report reveal queries [data-field] inside
+                    [data-anim="report"] (line 613) and its 2.2s safety-net
+                    re-shows anything still faded (line 540). It sits on the
+                    answer text alone, so the numbered label stays put while
+                    only the answer slides in — putting it on the wrapper
+                    would animate the whole block and change the reveal. */}
                 <div
+                  data-field="1"
                   className={`text-[14px] italic leading-[1.55] text-dim-1 ${
                     i < REPORT_FIELDS.length - 1
                       ? 'border-b border-dashed border-body/18 pb-[9px]'

@@ -23,8 +23,15 @@ describe('Checklist', () => {
     expect(container.querySelector('form')).toBeNull();
     expect(container.querySelector('input')).toBeNull();
   });
-  it('marks each report field with data-field so the reveal pass can find it', () => {
+  // Asserts the marker's DOM position, not merely its count: the design puts
+  // data-field on the answer text alone so only that slides in while the
+  // numbered label stays put. A count-only check passes just as happily with
+  // the marker on the wrapper, which would animate the whole block.
+  it('marks each answer text node with data-field, not the field wrapper', () => {
     const { container } = render(<Checklist />);
-    expect(container.querySelectorAll('[data-field="1"]')).toHaveLength(REPORT_FIELDS.length);
+    const marked = Array.from(container.querySelectorAll('[data-field="1"]'));
+    expect(marked.map((el) => el.textContent)).toEqual(
+      REPORT_FIELDS.map((f) => f.placeholder),
+    );
   });
 });
