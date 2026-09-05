@@ -3,7 +3,7 @@ import { parseCommand } from './commands';
 
 export const MAX_LINES = 6;
 
-export type ConsoleLine = { mark: '·' | '›'; text: string; color: string };
+export type ConsoleLine = { id: number; mark: '·' | '›'; text: string; color: string };
 export type ConsoleState = { lines: ConsoleLine[]; sound: boolean };
 
 export type ConsoleAction =
@@ -12,9 +12,19 @@ export type ConsoleAction =
   | { type: 'clear' }
   | { type: 'toggleSound' };
 
-const append = (state: ConsoleState, line: ConsoleLine): ConsoleState => ({
+// Every line gets an identity at creation. Keying the rendered list by array
+// index instead means that, past the MAX_LINES cap, one append shifts every
+// line down a slot and React rewrites the text of all six nodes — inside
+// ConsoleLog's aria-live="polite" region that reads as six changed nodes, so
+// a screen reader re-announces the whole scrollback after every command
+// rather than just the reply. A module-level counter keeps consoleReducer a
+// pure function of (state, action) for the reducer tests' purposes while
+// still handing each line a value that never moves.
+let nextLineId = 0;
+
+const append = (state: ConsoleState, line: Omit<ConsoleLine, 'id'>): ConsoleState => ({
   ...state,
-  lines: state.lines.concat(line).slice(-MAX_LINES),
+  lines: state.lines.concat({ ...line, id: nextLineId++ }).slice(-MAX_LINES),
 });
 
 export function consoleReducer(state: ConsoleState, action: ConsoleAction): ConsoleState {

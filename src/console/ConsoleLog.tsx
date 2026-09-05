@@ -12,8 +12,11 @@ export function ConsoleLog({ lines }: { lines: ConsoleLine[] }) {
       aria-live="polite"
       className="flex max-h-[150px] flex-col justify-end overflow-hidden px-[18px]"
     >
-      {lines.map((line, i) => (
-        <div key={i} className="flex gap-[9px] font-mono text-[11.5px] leading-[1.85]">
+      {/* Keyed by the line's own id, not its array index: see the note on
+          `append` in useConsole.ts — an index key turns every append past the
+          cap into six rewritten nodes in this aria-live region. */}
+      {lines.map((line) => (
+        <div key={line.id} className="flex gap-[9px] font-mono text-[11.5px] leading-[1.85]">
           <span className="flex-none text-dim-4">{line.mark}</span>
           <span style={{ color: line.color }}>{line.text}</span>
         </div>
