@@ -4,6 +4,8 @@ import { useMagnetic } from '../../motion/useMagnetic';
 import { prefersReducedMotion } from '../../lib/env';
 import { HeroAtmosphere } from '../atmosphere/HeroAtmosphere';
 import portrait from '../../assets/brian-speaking.png';
+import portraitAvif from '../../assets/brian-speaking.avif';
+import portraitWebp from '../../assets/brian-speaking.webp';
 
 // Ported from design source (portfolio-v5-flight-deck.dc.html lines 73-101):
 // chapter 00, the hero the visitor lands on. The section id/data attributes
@@ -93,11 +95,15 @@ export function Arrival() {
         data-anim="hero-photo"
         className="relative z-[1] min-h-[300px] w-full max-w-[340px] max-h-[min(64vh,520px)] justify-self-start self-stretch overflow-hidden border border-body/12"
       >
-        <img
-          src={portrait}
-          alt="Brian Otieno"
-          className="block h-[108%] w-full object-cover object-[52%_14%] saturate-[.8] contrast-[1.06] brightness-90"
-        />
+        <picture>
+          <source srcSet={portraitAvif} type="image/avif" />
+          <source srcSet={portraitWebp} type="image/webp" />
+          <img
+            src={portrait}
+            alt="Brian Otieno"
+            className="block h-[108%] w-full object-cover object-[52%_14%] saturate-[.8] contrast-[1.06] brightness-90"
+          />
+        </picture>
         <div
           aria-hidden="true"
           className="absolute inset-0"
