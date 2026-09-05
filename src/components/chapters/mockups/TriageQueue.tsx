@@ -15,6 +15,10 @@ import { triageQueueVars } from './mockupPalette';
 // name — gated by `prefersReducedMotion()` the same way Arrival.tsx gates
 // its own use of it.
 //
+// The four queue rows carry data-row="1" from the design (lines 169-172):
+// useReveal stages the rows of each [data-anim="screen"] in on the screen's
+// own trigger, so the marker is what puts this queue's rows in that stagger.
+//
 // Decorative product illustration with invented sample data (site names,
 // timestamps, technician handles): wrapped in role="img" with a describing
 // aria-label, and every internal node is aria-hidden so a screen reader
@@ -43,7 +47,10 @@ export function TriageQueue() {
         className="grid min-h-[340px] [grid-template-columns:minmax(0,1fr)_210px]"
       >
         <div className="flex flex-col gap-2 px-[14px] py-3">
-          <div className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/22 p-[11px_12px]">
+          <div
+            data-row="1"
+            className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/22 p-[11px_12px]"
+          >
             <div>
               <div className="text-[13px] text-body">Borehole 14 · Kibera South</div>
               <div className="mt-[3px] font-mono text-[10px] text-[var(--mock-muted-green-gray)]">
@@ -55,7 +62,10 @@ export function TriageQueue() {
             </div>
           </div>
 
-          <div className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/16 p-[11px_12px]">
+          <div
+            data-row="1"
+            className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/16 p-[11px_12px]"
+          >
             <div>
               <div className="text-[13px] text-body">Standpipe 07 · Ruiru</div>
               <div className="mt-[3px] font-mono text-[10px] text-[var(--mock-muted-green-gray)]">
@@ -67,7 +77,10 @@ export function TriageQueue() {
             </div>
           </div>
 
-          <div className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/16 p-[11px_12px]">
+          <div
+            data-row="1"
+            className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/16 p-[11px_12px]"
+          >
             <div>
               <div className="text-[13px] text-body">Kiosk 22 · Athi River</div>
               <div className="mt-[3px] font-mono text-[10px] text-[var(--mock-muted-green-gray)]">
@@ -79,7 +92,10 @@ export function TriageQueue() {
             </div>
           </div>
 
-          <div className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/16 p-[11px_12px]">
+          <div
+            data-row="1"
+            className="grid grid-cols-[minmax(0,1fr)_92px] items-center gap-3 border border-go/16 p-[11px_12px]"
+          >
             <div>
               <div className="text-[13px] text-body">Borehole 03 · Kajiado</div>
               <div className="mt-[3px] font-mono text-[10px] text-[var(--mock-muted-green-gray)]">

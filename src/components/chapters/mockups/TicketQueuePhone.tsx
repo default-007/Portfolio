@@ -13,6 +13,12 @@ import { ticketQueuePhoneVars } from './mockupPalette';
 // would become the grid's sole auto-placed item and collapse the
 // `248px minmax(0,1fr)` column split.
 //
+// The three ticket cards carry data-row="1" and the twelve dispatch bars
+// data-bar-v="1", both from the design (lines 221-223 and 231): useReveal
+// stages a screen's rows in on the screen's own trigger and grows the
+// vertical bars from their 50% 100% origin, and these markers are what puts
+// this mockup's internals in those tweens.
+//
 // Decorative product illustration with invented sample data (ticket
 // numbers, branch names, SLA figures): wrapped in role="img" with a
 // describing aria-label, and every internal node is aria-hidden so a
@@ -38,7 +44,7 @@ export function TicketQueuePhone() {
           <div className="flex flex-col gap-2 p-[10px_12px_14px]">
             <div className="mb-0.5 font-display text-[19px] text-bone">My queue · 6</div>
 
-            <div className="border border-ember/30 p-[9px_10px]">
+            <div data-row="1" className="border border-ember/30 p-[9px_10px]">
               <div className="text-[12.5px] text-bone">#4821 · POS offline</div>
               <div className="mt-1 font-mono text-[9.5px] text-dim-1">Nakuru branch · P1</div>
               <div className="mt-2 h-[3px] bg-body/12">
@@ -47,7 +53,7 @@ export function TicketQueuePhone() {
               <div className="mt-[5px] font-mono text-[9px] text-rust">SLA 82% · 34m LEFT</div>
             </div>
 
-            <div className="border border-body/12 p-[9px_10px]">
+            <div data-row="1" className="border border-body/12 p-[9px_10px]">
               <div className="text-[12.5px] text-bone">#4817 · Receipt printer</div>
               <div className="mt-1 font-mono text-[9.5px] text-dim-1">Thika road · P2</div>
               <div className="mt-2 h-[3px] bg-body/12">
@@ -56,7 +62,7 @@ export function TicketQueuePhone() {
               <div className="mt-[5px] font-mono text-[9px] text-ember">SLA 44% · 3h 12m</div>
             </div>
 
-            <div className="border border-body/12 p-[9px_10px]">
+            <div data-row="1" className="border border-body/12 p-[9px_10px]">
               <div className="text-[12.5px] text-bone">#4809 · M-Pesa mismatch</div>
               <div className="mt-1 font-mono text-[9.5px] text-dim-1">Westlands · P3</div>
               <div className="mt-2 h-[3px] bg-body/12">
@@ -82,18 +88,18 @@ export function TicketQueuePhone() {
           DISPATCH · SLA PRESSURE, LAST 12H
         </div>
         <div className="grid h-[150px] grid-cols-12 items-end gap-[5px]">
-          <div className="h-[38%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[52%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[44%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[68%] origin-[50%_100%] bg-ember" />
-          <div className="h-[82%] origin-[50%_100%] bg-ember" />
-          <div className="h-[96%] origin-[50%_100%] bg-rust" />
-          <div className="h-[74%] origin-[50%_100%] bg-ember" />
-          <div className="h-[58%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[46%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[34%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[28%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
-          <div className="h-[40%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[38%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[52%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[44%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[68%] origin-[50%_100%] bg-ember" />
+          <div data-bar-v="1" className="h-[82%] origin-[50%_100%] bg-ember" />
+          <div data-bar-v="1" className="h-[96%] origin-[50%_100%] bg-rust" />
+          <div data-bar-v="1" className="h-[74%] origin-[50%_100%] bg-ember" />
+          <div data-bar-v="1" className="h-[58%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[46%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[34%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[28%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
+          <div data-bar-v="1" className="h-[40%] origin-[50%_100%] bg-[var(--mock-deep-green)]" />
         </div>
         <div className="mt-[9px] flex justify-between font-mono text-[9px] text-dim-4">
           <span>21:00</span>

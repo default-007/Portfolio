@@ -72,3 +72,35 @@ describe.each([
     expect(exposed).toEqual([]);
   });
 });
+
+// The mockups' interiors are animated by useReveal, which finds them by the
+// design's own marker attributes — [data-row] inside each [data-anim="screen"]
+// stages in on the screen's trigger, [data-bar-v] grows from its bottom
+// origin. Nothing renders differently if a marker is dropped in an edit, and
+// nothing else in the suite queries them, so the counts are pinned here
+// against the design source's own.
+describe('motion markers', () => {
+  it.each([
+    [CompetencySheet, 5, 'design lines 151-155'],
+    [TriageQueue, 4, 'design lines 169-172'],
+    [TicketQueuePhone, 3, 'design lines 221-223'],
+  ])('marks all $1 data-row elements the design has ($2)', (Mockup, count) => {
+    const { container } = render(<Mockup />);
+    expect(container.querySelectorAll('[data-row]')).toHaveLength(count);
+  });
+
+  it('marks all twelve dispatch bars with data-bar-v (design line 231)', () => {
+    const { container } = render(<TicketQueuePhone />);
+    expect(container.querySelectorAll('[data-bar-v]')).toHaveLength(12);
+  });
+
+  it('keeps every marked row inside its data-anim="screen" root', () => {
+    for (const Mockup of [CompetencySheet, TriageQueue, TicketQueuePhone]) {
+      const { container } = render(<Mockup />);
+      const screen = container.querySelector('[data-anim="screen"]')!;
+      for (const row of container.querySelectorAll('[data-row]')) {
+        expect(screen.contains(row)).toBe(true);
+      }
+    }
+  });
+});

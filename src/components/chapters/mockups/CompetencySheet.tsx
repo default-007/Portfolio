@@ -10,6 +10,10 @@ import { competencySheetVars } from './mockupPalette';
 // than that wrapper — duplicating it here would double the 6px vertical
 // padding and nest two overflow-x-auto containers.
 //
+// The five learner rows carry data-row="1" from the design (lines 151-155):
+// useReveal stages the rows of each [data-anim="screen"] in on the screen's
+// own trigger, so the marker is what puts this sheet's rows in that stagger.
+//
 // Decorative product illustration with invented sample data (learner names,
 // scores): wrapped in role="img" with a describing aria-label, and every
 // internal node is aria-hidden so a screen reader isn't read a roster of
@@ -65,7 +69,10 @@ export function CompetencySheet() {
             <span className="text-right">LEVEL</span>
           </div>
 
-          <div className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]">
+          <div
+            data-row="1"
+            className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]"
+          >
             <span>Achieng, W.</span>
             <span className="font-mono text-[11px] text-[var(--mock-deep-green)]">EE</span>
             <span className="font-mono text-[11px] text-[var(--mock-deep-green)]">EE</span>
@@ -77,7 +84,10 @@ export function CompetencySheet() {
             </span>
           </div>
 
-          <div className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]">
+          <div
+            data-row="1"
+            className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]"
+          >
             <span>Barasa, K.</span>
             <span className="font-mono text-[11px] text-[var(--mock-clay)]">ME</span>
             <span className="font-mono text-[11px] text-[var(--mock-clay)]">ME</span>
@@ -89,7 +99,10 @@ export function CompetencySheet() {
             </span>
           </div>
 
-          <div className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]">
+          <div
+            data-row="1"
+            className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]"
+          >
             <span>Chebet, N.</span>
             <span className="font-mono text-[11px] text-[var(--mock-clay)]">ME</span>
             <span className="font-mono text-[11px] text-rust">AE</span>
@@ -101,7 +114,10 @@ export function CompetencySheet() {
             </span>
           </div>
 
-          <div className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]">
+          <div
+            data-row="1"
+            className="grid items-center border-b border-[var(--mock-row-divider)] py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]"
+          >
             <span>Kimani, J.</span>
             <span className="font-mono text-[11px] text-rust">AE</span>
             <span className="font-mono text-[11px] text-rust">AE</span>
@@ -113,7 +129,10 @@ export function CompetencySheet() {
             </span>
           </div>
 
-          <div className="grid items-center py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]">
+          <div
+            data-row="1"
+            className="grid items-center py-[9px] text-[12.5px] text-[var(--mock-row-ink)] [grid-template-columns:minmax(0,1fr)_62px_62px_62px_74px]"
+          >
             <span>Omondi, T.</span>
             <span className="font-mono text-[11px] text-[var(--mock-deep-green)]">EE</span>
             <span className="font-mono text-[11px] text-[var(--mock-clay)]">ME</span>
