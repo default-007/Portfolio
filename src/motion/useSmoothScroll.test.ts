@@ -133,8 +133,10 @@ describe('useSmoothScroll', () => {
       // Call scrollTo
       result.current.scrollTo('ch3');
 
-      // Verify scrollIntoView was called with smooth behavior
-      expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'smooth' });
+      // The fallback branch exists *because* reduced motion is on, so the
+      // scroll it performs must not itself be animated. 'smooth' here is an
+      // explicit animation request that no UA suppresses.
+      expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'auto' });
 
       tickerAddSpy.mockRestore();
     } finally {

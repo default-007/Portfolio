@@ -34,7 +34,15 @@ export function useSmoothScroll() {
       lenisRef.current.scrollTo(selector, { offset: 0, duration: 1.2 });
       return;
     }
-    document.querySelector(selector)?.scrollIntoView({ behavior: 'smooth' });
+    // This branch is only reachable when Lenis was never constructed, and the
+    // only reason that happens is the reduced-motion return above — so an
+    // explicit `behavior: 'smooth'` here would hand an animated scroll across
+    // six full-viewport chapters to precisely the user who asked the OS not to
+    // animate. Unlike CSS `scroll-behavior`, no UA suppresses an explicit
+    // scrollIntoView smooth request, so the choice has to be made here.
+    document.querySelector(selector)?.scrollIntoView({
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
   }, []);
 
   return { scrollTo };
