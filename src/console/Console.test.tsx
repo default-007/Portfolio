@@ -156,6 +156,17 @@ describe('Console', () => {
     });
   });
 
+  describe('activeId prop syncs the j/k cursor to the reader\'s real position', () => {
+    it('steps from the given activeId rather than the console\'s last-routed index', async () => {
+      const user = userEvent.setup();
+      const onRoute = vi.fn();
+      render(<Console onRoute={onRoute} activeId="ch3" />);
+
+      await user.keyboard('j');
+      expect(onRoute).toHaveBeenCalledWith('ch4');
+    });
+  });
+
   it('removes the keydown listener it added on unmount', () => {
     const addSpy = vi.spyOn(window, 'addEventListener');
     const removeSpy = vi.spyOn(window, 'removeEventListener');

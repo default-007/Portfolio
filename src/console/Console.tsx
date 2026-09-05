@@ -24,11 +24,32 @@ const CHIP_CLASS =
 // to wire to useSmoothScroll's `scrollTo`. That keeps Console mountable in
 // isolation (as the brief's own tests do) without constructing a real
 // Lenis instance per test.
-export function Console({ onRoute }: { onRoute: (chapterId: string) => void }) {
+//
+// `activeId` is optional and, when given, is expected to be the page's
+// live reading position (useChapterTracking's `activeId`). Without it,
+// activeIndexRef only ever moves inside handleRoute — i.e. only in
+// response to console-issued navigation — so j/k would step from wherever
+// the console last sent the reader rather than from where they actually
+// scrolled to by hand. Optional keeps every test that mounts Console
+// without this prop (including this file's own, pre-existing ones)
+// passing unchanged.
+export function Console({
+  onRoute,
+  activeId,
+}: {
+  onRoute: (chapterId: string) => void;
+  activeId?: string;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const activeIndexRef = useRef(0);
   const soundRef = useRef(false);
+
+  useEffect(() => {
+    if (!activeId) return;
+    const idx = CHAPTER_IDS.indexOf(activeId);
+    if (idx !== -1) activeIndexRef.current = idx;
+  }, [activeId]);
 
   const handleRoute = useCallback(
     (id: string) => {
