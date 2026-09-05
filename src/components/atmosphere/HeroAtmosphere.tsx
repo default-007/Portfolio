@@ -26,11 +26,16 @@ function CssAura() {
 // would lose its atmosphere entirely. Resolving the failure to the CSS aura
 // keeps the fallback as the floor: the worst case is the design without the
 // upgrade, never a hole in the page.
-const EmberField = lazy(() =>
+// Exported so the failure path can be asserted directly. Going through
+// <Suspense> instead proves nothing: its fallback is the aura too, so the
+// aura shows while the import is merely pending, whether or not the
+// rejection is ever handled.
+export const loadEmberField = () =>
   import('./EmberField')
     .then((m) => ({ default: m.EmberField }))
-    .catch(() => ({ default: CssAura })),
-);
+    .catch(() => ({ default: CssAura }));
+
+const EmberField = lazy(loadEmberField);
 
 export function HeroAtmosphere() {
   // Capability checks run after mount so the first paint is always the CSS

@@ -190,7 +190,7 @@ export function EmberField() {
       <Canvas
         // Every value below is set explicitly rather than inherited: several
         // react-three-fiber defaults (fov 75, ACES tone mapping, sRGB output
-        // conversion, unclamped dpr) would change how this looks or what it
+        // conversion, dpr capped at [1, 2]) would change how this looks or what it
         // costs, and an inherited default is a decision nobody made.
         camera={{ fov: 50, near: 0.1, far: 100, position: [0, 0, 5] }}
         dpr={[1, 1.5]}
@@ -204,7 +204,10 @@ export function EmberField() {
           depth: false,
           stencil: false,
           preserveDrawingBuffer: false,
-          powerPreference: 'high-performance',
+          // Deliberately not 'high-performance': this is an ambient background
+          // that mobile, no-WebGL and reduced-motion readers never see at all.
+          // Asking for the discrete GPU would cost battery for decoration.
+          powerPreference: 'low-power',
         }}
         style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
       >

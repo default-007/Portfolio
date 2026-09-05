@@ -1,15 +1,25 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 vi.mock('../../lib/env', () => ({
   hasWebGL: vi.fn(),
   prefersReducedMotion: vi.fn(),
 }));
 
+// Standing in for the real WebGL component: jsdom has no GL context, and the
+// point of these two tests is which branch HeroAtmosphere chooses, not what
+// the shader draws.
+vi.mock('./EmberField', () => ({
+  EmberField: () => <div data-testid="ember-field" />,
+}));
+
 import { hasWebGL, prefersReducedMotion } from '../../lib/env';
 import { HeroAtmosphere } from './HeroAtmosphere';
 
-afterEach(() => vi.clearAllMocks());
+afterEach(() => {
+  vi.clearAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('HeroAtmosphere', () => {
   it('falls back to the CSS aura when WebGL is unavailable', () => {
@@ -35,6 +45,27 @@ describe('HeroAtmosphere', () => {
     // jsdom's matchMedia stub reports `matches: false`, so the >=1024px gate
     // also keeps this narrow-viewport render on the fallback.
     expect(screen.getByTestId('css-aura')).toBeInTheDocument();
+  });
+
+  // Every test above lands on the fallback, so all of them would still pass if
+  // the capability check were broken to always return false. These two are the
+  // ones that fail in that case: they drive the upgrade branch itself.
+  it('mounts the ember field on a wide screen with WebGL and motion allowed', async () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }) as MediaQueryList);
+    vi.mocked(hasWebGL).mockReturnValue(true);
+    vi.mocked(prefersReducedMotion).mockReturnValue(false);
+    render(<HeroAtmosphere />);
+    await waitFor(() => expect(screen.getByTestId('ember-field')).toBeInTheDocument());
+    expect(screen.queryByTestId('css-aura')).not.toBeInTheDocument();
+  });
+
+  it('keeps the aura on a narrow screen even when WebGL and motion allow it', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false }) as MediaQueryList);
+    vi.mocked(hasWebGL).mockReturnValue(true);
+    vi.mocked(prefersReducedMotion).mockReturnValue(false);
+    render(<HeroAtmosphere />);
+    expect(screen.getByTestId('css-aura')).toBeInTheDocument();
+    expect(screen.queryByTestId('ember-field')).not.toBeInTheDocument();
   });
 
   it('carries the design aura gradient and drift class verbatim', () => {
