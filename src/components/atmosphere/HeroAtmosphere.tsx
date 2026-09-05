@@ -1,0 +1,52 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { hasWebGL, prefersReducedMotion } from '../../lib/env';
+
+// Ported verbatim from the design source
+// (portfolio-v5-flight-deck.dc.html line 74) — the chapter 00 aura. This is
+// the contract: it paints first and it is what remains whenever the WebGL
+// upgrade is unavailable, declined or fails to load.
+const AURA_BACKGROUND =
+  'radial-gradient(45% 45% at 38% 44%, rgba(192,96,58,0.36) 0%, rgba(192,96,58,0) 70%), ' +
+  'radial-gradient(38% 38% at 66% 62%, rgba(232,163,61,0.22) 0%, rgba(232,163,61,0) 72%)';
+
+function CssAura() {
+  return (
+    <div
+      data-testid="css-aura"
+      data-anim="aura"
+      aria-hidden="true"
+      className="deck-aura pointer-events-none absolute -top-[24%] -left-[8%] h-[150%] w-[72%]"
+      style={{ background: AURA_BACKGROUND }}
+    />
+  );
+}
+
+// If the `three` chunk fails to arrive (offline, cache miss, blocked CDN), a
+// bare React.lazy would throw into the nearest error boundary and the hero
+// would lose its atmosphere entirely. Resolving the failure to the CSS aura
+// keeps the fallback as the floor: the worst case is the design without the
+// upgrade, never a hole in the page.
+const EmberField = lazy(() =>
+  import('./EmberField')
+    .then((m) => ({ default: m.EmberField }))
+    .catch(() => ({ default: CssAura })),
+);
+
+export function HeroAtmosphere() {
+  // Capability checks run after mount so the first paint is always the CSS
+  // fallback — the 3D layer is an upgrade, never a prerequisite.
+  const [use3D, setUse3D] = useState(false);
+
+  useEffect(() => {
+    const wide = window.matchMedia('(min-width: 1024px)').matches;
+    setUse3D(wide && hasWebGL() && !prefersReducedMotion());
+  }, []);
+
+  if (!use3D) return <CssAura />;
+
+  return (
+    <Suspense fallback={<CssAura />}>
+      <EmberField />
+    </Suspense>
+  );
+}

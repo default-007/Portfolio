@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useSplitText } from '../../motion/useSplitText';
 import { useMagnetic } from '../../motion/useMagnetic';
 import { prefersReducedMotion } from '../../lib/env';
+import { HeroAtmosphere } from '../atmosphere/HeroAtmosphere';
 import portrait from '../../assets/brian-speaking.png';
 
 // Ported from design source (portfolio-v5-flight-deck.dc.html lines 73-101):
@@ -24,15 +25,12 @@ export function Arrival() {
       data-screen-label="00"
       className="relative grid min-h-screen items-center overflow-hidden border-b border-body/10 pb-[120px] pl-[76px] pr-10 pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))] gap-10"
     >
-      <div
-        data-anim="aura"
-        aria-hidden="true"
-        className="deck-aura pointer-events-none absolute -top-[24%] -left-[8%] h-[150%] w-[72%]"
-        style={{
-          background:
-            'radial-gradient(45% 45% at 38% 44%, rgba(192,96,58,0.36) 0%, rgba(192,96,58,0) 70%), radial-gradient(38% 38% at 66% 62%, rgba(232,163,61,0.22) 0%, rgba(232,163,61,0) 72%)',
-        }}
-      />
+      {/* The aura moved into HeroAtmosphere, which renders this exact CSS
+          layer and swaps in the WebGL ember field only where the device can
+          afford it. Nothing in JS queries [data-anim="aura"] — the drift is
+          pure CSS on .deck-aura — so the marker travelling with the element
+          changes no behaviour. */}
+      <HeroAtmosphere />
 
       <div className="relative z-[1]">
         <div
