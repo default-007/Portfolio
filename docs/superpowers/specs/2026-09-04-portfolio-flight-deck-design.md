@@ -24,7 +24,21 @@ console all serve it. Implementation must preserve it.
 | HostPinnacle free tier is cPanel shared hosting: static files, PHP, MySQL — no Python/WSGI | The existing Django project cannot run there and is removed. No server-side code of any kind. |
 | Deployment is a file upload, not a pipeline | Build output must be self-contained and path-relative. |
 | Site is a hiring artifact | The repo itself is read by hiring managers. Code quality is part of the deliverable. |
-| Audience includes low-bandwidth and low-end Android devices (stated in the design's own copy) | First paint must not depend on the 3D bundle. Content must render without JS. |
+| Audience includes low-bandwidth and low-end Android devices (stated in the design's own copy) | First paint must not depend on the 3D bundle. Content must render without *motion*: every reveal is a `fromTo` with `immediateRender: false` and every effect is gated on `prefers-reduced-motion`, so a device that never runs the animations still shows the whole page. With JavaScript disabled entirely, `index.html`'s `<noscript>` routes the visitor to `./resume.html` — a complete, standalone, dependency-free résumé, not an apology. |
+
+**On rendering without JavaScript.** An earlier draft of this row read
+"content must render without JS", which §3 contradicts: the stack chosen
+there is a client-rendered React SPA served as static files. Prerendering
+the single page at build time (`react-dom/server` into `#root`, or
+`vite-plugin-prerender`) was considered and **deferred**. It is mechanically
+cheap — one page, no router, no data fetching — but it makes hydration
+mismatch a live concern for `useSplitText`'s raw DOM mutations and
+`StatusStrip`'s clock, and that risk is not worth taking at this point in
+the branch. What ships instead is the guarantee stated in the row above, and
+that guarantee is what addresses the audience concern this constraint is
+about: bandwidth and CPU. The entry chunk is ~21 kB gzipped, the 3D layer is
+lazy and desktop-only, and `resume.html` is the no-JS deliverable. Revisit
+prerendering if the site ever grows a second route.
 
 ## 3. Stack
 

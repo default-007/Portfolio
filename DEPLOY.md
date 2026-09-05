@@ -13,20 +13,57 @@ beyond plain static file hosting is required.
 
 ## Upload
 
-1. Run `npm run build` locally.
-2. Log in to cPanel and open **File Manager**.
-3. Navigate to `public_html` (or the target domain/subdomain's document root).
-4. Delete the previous deployment's contents from that directory.
-5. Upload the **contents** of `dist/` — not the `dist` folder itself. Select
-   everything inside `dist/` (`index.html`, `assets/`, `resume.html`,
-   `.htaccess`, and any other files Vite emitted) and upload those directly
-   into `public_html`, so `index.html` ends up at `public_html/index.html`,
-   not `public_html/dist/index.html`.
-6. Confirm `.htaccess` made it into the upload. File Manager hides dotfiles by
-   default — enable **Settings → Show Hidden Files (dotfiles)** in the File
-   Manager toolbar to see it and verify it landed alongside `index.html`.
-7. Hard-refresh the site in your browser (Ctrl+Shift+R / Cmd+Shift+R) to
-   bypass any cached copy of the old `index.html` before checking the result.
+cPanel's File Manager uploader accepts **files only** — it cannot upload a
+directory. Selecting the contents of `dist/` therefore uploads the four
+loose files and silently skips `assets/`, which leaves the site unstyled and
+scriptless with a 404 in the console. Ship a zip and extract it server-side
+instead.
+
+1. Run `npm run build` locally. It must print all three check lines (bundle,
+   resume, htaccess) — if it does not, do not deploy.
+2. From the project root, zip the build's *contents*, not the folder:
+
+   ```bash
+   cd dist && zip -r ../deploy.zip . -x '.DS_Store' && cd ..
+   ```
+
+   The `.` includes dotfiles, so `.htaccess` is in the archive. Confirm it
+   before uploading anything:
+
+   ```bash
+   unzip -l deploy.zip | grep htaccess
+   ```
+
+3. Log in to cPanel, open **File Manager**, and navigate to `public_html`
+   (or the target domain/subdomain's document root).
+4. Enable **Settings → Show Hidden Files (dotfiles)** in the File Manager
+   toolbar. Do this first: without it you cannot see — or delete — the old
+   `.htaccess`, and a stale one survives the redeploy.
+5. Delete the previous deployment's contents from that directory, including
+   the old `assets/` folder and the old `.htaccess`.
+6. Upload `deploy.zip` into `public_html`. Then select it in File Manager and
+   choose **Extract**, extracting into `public_html` itself.
+7. Delete `deploy.zip` from `public_html` once the extraction has finished —
+   it is a full copy of the site and does not belong on the web root.
+8. Verify, in this order, before touching the browser:
+   - `public_html/index.html` exists — at the web root, **not** nested as
+     `public_html/dist/index.html`. If it is nested, the zip was made from
+     the project root instead of from inside `dist/`.
+   - `public_html/assets/` exists and contains `.js` and `.css` files.
+   - `public_html/.htaccess` exists (dotfiles shown, per step 4).
+   - `public_html/resume.html` exists.
+9. Hard-refresh the site in your browser (Ctrl+Shift+R / Cmd+Shift+R) to
+   bypass any cached copy of the old `index.html`.
+
+### If something is wrong
+
+- **The page is unstyled, or the console shows 404s for `/assets/…`** —
+  `assets/` did not extract. Re-check step 8 and re-extract.
+- **The page is a 500 (blank server error)** — remove `.htaccess` from
+  `public_html` and reload. If the site comes back, the host is missing an
+  Apache module the file uses and the file needs revisiting; the build's
+  htaccess check guards the known case (`Header` outside `mod_headers`), but
+  a 500 that clears this way is always the `.htaccess`.
 
 ## Notes
 
