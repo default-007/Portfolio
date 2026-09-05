@@ -52,7 +52,13 @@ describe('FlightProfile', () => {
     expect(screen.getByText(/INSTITUTIONS REACHED/)).toBeInTheDocument();
   });
 
-  it('shows stat values before any animation runs', () => {
+  // With gsap.to mocked to a no-op above, this asserts that React's own
+  // markup carries the final stat value — it cannot observe a live tween
+  // stomping that value, because the mocked tween never calls onUpdate.
+  // Production is safe for a different reason: useCounter builds a gsap.to()
+  // (immediateRender false) driven by a toggle-actions ScrollTrigger, not a
+  // scrub, so nothing writes to the node until the reader scrolls to it.
+  it('renders the final stat value into static markup, with no tween required', () => {
     render(<FlightProfile />);
     expect(screen.getByText('244')).toBeInTheDocument();
   });
