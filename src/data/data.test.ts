@@ -42,7 +42,7 @@ describe('experience', () => {
 
   it('lists legs most recent first, pinning company and role text', () => {
     expect(LEGS.map((l) => l.company)).toEqual([
-      'Lloyd Constellations',
+      'Lloyd Cooper',
       'Integrated Spatial',
       'Bakpage Labs',
       'Eclectics International',
@@ -187,7 +187,7 @@ describe('contact', () => {
     ]);
     expect(CERTIFICATIONS).toEqual([
       'AWS Cloud Practitioner',
-      'Cisco Junior Cyber Security Analyst (in progress)',
+      'Cisco CCNA (in progress)',
     ]);
   });
 });

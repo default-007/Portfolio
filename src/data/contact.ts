@@ -25,5 +25,5 @@ export const EDUCATION: readonly string[] = [
 
 export const CERTIFICATIONS: readonly string[] = [
   'AWS Cloud Practitioner',
-  'Cisco Junior Cyber Security Analyst (in progress)',
+  'Cisco CCNA (in progress)',
 ] as const;

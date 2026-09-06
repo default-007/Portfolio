@@ -62,7 +62,7 @@ describe('Clearance', () => {
     expect(lines.map((line) => line.replace(/<[^>]+>/g, ''))).toEqual([
       'MSc Computing &amp; Information Systems — Strathmore (in progress)',
       'Data Science &amp; ML — MIT · Software Development — Moringa · BSc Civil Aviation — Moi',
-      'AWS Cloud Practitioner · Cisco Junior Cyber Security Analyst (in progress)',
+      'AWS Cloud Practitioner · Cisco CCNA (in progress)',
     ]);
 
     expect(lines[0]).toMatch(/Strathmore <span class="text-ember">\(in progress\)<\/span>$/);

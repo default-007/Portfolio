@@ -351,15 +351,22 @@ invented.
 Until they arrive, build the component with the placeholder copy intact
 so the layout is real and the text is a one-line swap.
 
-### 12.4 Two content discrepancies to confirm
+### 12.4 Content discrepancies — RESOLVED by Brian
 
-Both are between the résumé and the flight deck, and both need Brian to
-say which is correct:
+All four were between the résumé and the flight deck; Brian confirmed
+the résumé is correct in each case.
 
-1. **Employer name.** Résumé: "Lloyd Cooper Consulting Group". Flight
-   deck: "Lloyd Constellations".
-2. **Cisco certification.** Résumé: "Cisco Certified Network Associate
-   (CCNA) · in progress". Flight deck: "Cisco Junior Cyber Security
-   Analyst · in progress".
+1. **Employer name.** "Lloyd Cooper", not the deck's "Lloyd
+   Constellations". The leg label uses the short form, matching its
+   siblings ("Integrated Spatial"); the résumé keeps the full "Lloyd
+   Cooper Consulting Group".
+2. **Cisco certification.** CCNA, not the deck's "Junior Cyber Security
+   Analyst". The deck shows "Cisco CCNA (in progress)"; the résumé keeps
+   the formal "Cisco Certified Network Associate (CCNA) · in progress".
+3. **MSc status.** "in progress", so the résumé's "Oct 2025 – Present"
+   became "Oct 2025 – in progress" and matches the deck.
+4. **Phone.** International format throughout: "+254 708 681091". The
+   résumé's "(+254) 708 681091" was normalised to match the deck.
 
-These are factual claims on a hiring document. Neither will be guessed.
+These are factual claims on a hiring document, so none were guessed —
+each is Brian's own answer.

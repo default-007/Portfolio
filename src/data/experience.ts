@@ -10,7 +10,7 @@ export type Leg = {
 
 export const LEGS: readonly Leg[] = [
   {
-    company: 'Lloyd Constellations',
+    company: 'Lloyd Cooper',
     role: 'Software Engineer',
     detail: 'ODOO 18 · 6 MODULES · 5 SERVERS',
     sector: 'ERP',
