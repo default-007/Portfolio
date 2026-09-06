@@ -67,6 +67,6 @@ describe('Clearance', () => {
 
     expect(lines[0]).toMatch(/Strathmore <span class="text-ember">\(in progress\)<\/span>$/);
     expect(lines[1]).not.toContain('<span');
-    expect(lines[2]).toMatch(/Analyst <span class="text-ember">\(in progress\)<\/span>$/);
+    expect(lines[2]).toMatch(/CCNA <span class="text-ember">\(in progress\)<\/span>$/);
   });
 });
