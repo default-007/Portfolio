@@ -181,12 +181,11 @@ function Embers() {
 
 export function EmberField() {
   return (
-    <div
-      data-testid="ember-field"
-      data-anim="aura"
-      aria-hidden="true"
-      className="pointer-events-none absolute -top-[24%] -left-[8%] h-[150%] w-[72%]"
-    >
+    // Positioning and the data-anim="aura" marker belong to HeroAtmosphere's
+    // AuraFrame, which outlives the swap from the CSS fallback to this. A
+    // marker here would be mounted after useReveal has already run and would
+    // never be scrubbed.
+    <div data-testid="ember-field" className="absolute inset-0">
       <Canvas
         // Every value below is set explicitly rather than inherited: several
         // react-three-fiber defaults (fov 75, ACES tone mapping, sRGB output

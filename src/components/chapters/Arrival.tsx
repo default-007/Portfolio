@@ -27,11 +27,11 @@ export function Arrival() {
       data-screen-label="00"
       className="relative grid min-h-screen items-center overflow-hidden border-b border-body/10 pb-[120px] pl-[76px] pr-10 pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))] gap-10"
     >
-      {/* The aura moved into HeroAtmosphere, which renders this exact CSS
+      {/* The aura lives in HeroAtmosphere, which renders the design's CSS
           layer and swaps in the WebGL ember field only where the device can
-          afford it. Nothing in JS queries [data-anim="aura"] — the drift is
-          pure CSS on .deck-aura — so the marker travelling with the element
-          changes no behaviour. */}
+          afford it. It keeps [data-anim="aura"] on a frame that outlives that
+          swap, because useReveal scrubs whatever carries the marker at App
+          mount and would otherwise lose the element out from under itself. */}
       <HeroAtmosphere />
 
       <div className="relative z-[1]">

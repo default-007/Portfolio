@@ -118,6 +118,17 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
       // overwrite there would kill the entrance the moment the scrub is
       // created.
 
+      // These two fromTo calls are the file's one deliberate exception to the
+      // `immediateRender: false` rule stated above, and the rule's own reason
+      // is why. That rule exists so a ScrollTrigger reveal which never fires
+      // cannot leave content hidden. A load-time timeline has no such failure
+      // mode: it plays unconditionally, on the tick it is created. Deferring
+      // the from-state here does not protect anything — it means the hero
+      // paints fully visible, then snaps to `opacity: 0, y: 22` when the
+      // playhead reaches 0.35s, then fades back in. Default immediateRender
+      // applies the from-state at creation, which is what design 583 assumes
+      // and what makes the 0.35s offset read as a beat rather than a flash.
+      //
       // The arrival intro (design 582-585). Chapter 00 is the one chapter
       // that animates on load rather than on scroll, so it is a timeline and
       // not a ScrollTrigger: the hero photo scales in from position 0 while
@@ -139,7 +150,6 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
               opacity: 1,
               duration: 0.9,
               stagger: 0.1,
-              immediateRender: false,
               overwrite: 'auto',
             },
             0.35,
@@ -155,7 +165,6 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
               scale: 1,
               duration: 1.5,
               ease: 'power2.out',
-              immediateRender: false,
               overwrite: 'auto',
             },
             0,

@@ -279,7 +279,11 @@ describe('useReveal', () => {
         timelineCallsFor(getByTestId('hero-photo'))[0]!;
       expect(introFrom).toMatchObject({ opacity: 0, scale: 1.06 });
       expect(introTo).toMatchObject({ opacity: 1, scale: 1, duration: 1.5, ease: 'power2.out' });
-      expect(introTo.immediateRender).toBe(false);
+      // The intro timeline is the one place immediateRender must NOT be
+      // false. It plays unconditionally at creation, so deferring the
+      // from-state does not guard against a reveal that never fires — it
+      // just paints the hero, then hides it, then fades it back in.
+      expect(introTo.immediateRender).toBeUndefined();
       // The intro is not scroll-driven in the design — it plays on load.
       expect(introTo.scrollTrigger).toBeUndefined();
       expect(introAt).toBe(0);
@@ -308,7 +312,11 @@ describe('useReveal', () => {
       const [, from, to, at] = timelineCallsFor(introFades)[0]!;
       expect(from).toMatchObject({ y: 22, opacity: 0 });
       expect(to).toMatchObject({ y: 0, opacity: 1, duration: 0.9, stagger: 0.1 });
-      expect(to.immediateRender).toBe(false);
+      // The intro timeline is the one place immediateRender must NOT be
+      // false. It plays unconditionally at creation, so deferring the
+      // from-state does not guard against a reveal that never fires — it
+      // just paints the hero, then hides it, then fades it back in.
+      expect(to.immediateRender).toBeUndefined();
       expect(to.scrollTrigger).toBeUndefined();
       expect(at).toBe(0.35);
       expect(timeline).toHaveBeenCalledWith({ defaults: { ease: 'expo.out' } });

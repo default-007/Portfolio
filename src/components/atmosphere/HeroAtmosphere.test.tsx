@@ -59,6 +59,32 @@ describe('HeroAtmosphere', () => {
     expect(screen.queryByTestId('css-aura')).not.toBeInTheDocument();
   });
 
+  // The scroll scrub for the whole atmosphere is created once, at App mount,
+  // over whatever carries data-anim="aura" at that moment — always the CSS
+  // fallback, since use3D starts false and EmberField is lazy. If that marker
+  // sat on the swapped child, the upgrade would unmount the scrubbed node and
+  // mount an unscrubbed one, and the ember field would sit motionless against
+  // scroll on exactly the machines it exists for. What keeps the scrub alive
+  // is that the marked node is the frame and never the layer inside it, so
+  // both capability paths are checked for that same shape.
+  it.each([
+    ['the CSS fallback', false, 'css-aura'],
+    ['the ember field', true, 'ember-field'],
+  ])('marks the frame, not %s, so the scroll scrub survives the swap', async (_l, webgl, id) => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }) as MediaQueryList);
+    vi.mocked(hasWebGL).mockReturnValue(webgl as boolean);
+    vi.mocked(prefersReducedMotion).mockReturnValue(false);
+    const { container } = render(<HeroAtmosphere />);
+
+    await waitFor(() => expect(screen.getByTestId(id as string)).toBeInTheDocument());
+
+    const marked = container.querySelectorAll('[data-anim="aura"]');
+    expect(marked).toHaveLength(1);
+    const layer = screen.getByTestId(id as string);
+    expect(marked[0]).not.toBe(layer);
+    expect(marked[0]).toContainElement(layer);
+  });
+
   it('keeps the aura on a narrow screen even when WebGL and motion allow it', () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }) as MediaQueryList);
     vi.mocked(hasWebGL).mockReturnValue(true);
@@ -74,7 +100,12 @@ describe('HeroAtmosphere', () => {
     render(<HeroAtmosphere />);
     const aura = screen.getByTestId('css-aura');
     expect(aura).toHaveClass('deck-aura');
-    expect(aura).toHaveAttribute('aria-hidden', 'true');
+    // aria-hidden and the positioning live on the frame that wraps whichever
+    // layer is mounted, so the whole atmosphere is hidden from assistive tech
+    // whether it is the CSS fallback or the WebGL upgrade.
+    const frame = aura.parentElement!;
+    expect(frame).toHaveAttribute('aria-hidden', 'true');
+    expect(frame).toHaveAttribute('data-anim', 'aura');
     // jsdom re-serialises rgba() with spaces; compare on the normalised form.
     const style = aura.getAttribute('style') ?? '';
     expect(style).toContain(
