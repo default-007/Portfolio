@@ -2,6 +2,14 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+**Status: complete.** All 19 tasks shipped on the `flight-deck` branch. The
+suite is 186 tests across 25 files, and `npm run build` passes its three
+output guards. Work done after the plan closed is recorded under
+[Post-plan changes](#post-plan-changes) at the bottom; the task bodies below
+are left as they were written, so read them as the record of what was planned,
+not as a description of the current code. `README.md` describes the code as it
+now stands.
+
 **Goal:** Ship Brian Otieno's "Flight Deck" portfolio as a static React site deployable to HostPinnacle free shared hosting by uploading a folder.
 
 **Architecture:** Vite builds a single-page React app — no router, seven anchor-linked full-viewport chapters. Content lives in typed data modules; presentation is Tailwind v4 utilities plus hand-written CSS for atmospheric effects. Lenis owns scrolling and drives GSAP ScrollTrigger through one shared RAF loop. One lazy-loaded three.js shader provides the hero's ember haze, falling back to the design's CSS gradient.
@@ -50,7 +58,11 @@
 | `src/motion/*.ts` | Lenis bridge and GSAP hooks |
 | `src/lib/env.ts` | Reduced-motion and WebGL capability checks |
 | `public/.htaccess` | Compression and cache headers |
+| `public/resume.html` | Standalone, dependency-free résumé page (Task 18) |
+| `scripts/check-bundle.mjs` | Build-output guards: lazy three, résumé shape, htaccess |
+| `scripts/htaccessGuard.mjs` | Unguarded `Header` directive detection, unit-tested |
 | `DEPLOY.md` | cPanel upload steps |
+| `README.md` | Repo overview, commands, load-bearing constraints |
 
 ---
 
@@ -66,7 +78,7 @@
 - Consumes: nothing
 - Produces: `prefersReducedMotion(): boolean`, `hasWebGL(): boolean` from `src/lib/env.ts`
 
-- [ ] **Step 1: Remove Django and the unused template, as its own commit**
+- [x] **Step 1: Remove Django and the unused template, as its own commit**
 
 ```bash
 git rm -r --cached venv Template Template.zip portfolio web manage.py
@@ -78,7 +90,7 @@ and the site needs no server. The Template/ theme was reviewed during
 design and deliberately not reused."
 ```
 
-- [ ] **Step 2: Scaffold and install**
+- [x] **Step 2: Scaffold and install**
 
 The directory already holds `.git/`, `docs/`, `design/` and `assets/`, so the
 scaffolder will warn it is not empty — choose **"Ignore files and continue"**.
@@ -92,7 +104,7 @@ npm install -D tailwindcss @tailwindcss/vite vitest jsdom \
   @types/three
 ```
 
-- [ ] **Step 3: Write `vite.config.ts`**
+- [x] **Step 3: Write `vite.config.ts`**
 
 ```ts
 import { defineConfig } from 'vite';
@@ -120,7 +132,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 4: Write `src/test-setup.ts`**
+- [x] **Step 4: Write `src/test-setup.ts`**
 
 ```ts
 import '@testing-library/jest-dom/vitest';
@@ -142,7 +154,7 @@ if (!window.matchMedia) {
 }
 ```
 
-- [ ] **Step 5: Write the failing test for capability detection**
+- [x] **Step 5: Write the failing test for capability detection**
 
 Create `src/lib/env.test.ts`:
 
@@ -181,12 +193,12 @@ describe('hasWebGL', () => {
 });
 ```
 
-- [ ] **Step 6: Run the test, verify it fails**
+- [x] **Step 6: Run the test, verify it fails**
 
 Run: `npx vitest run src/lib/env.test.ts`
 Expected: FAIL — cannot resolve `./env`.
 
-- [ ] **Step 7: Implement `src/lib/env.ts`**
+- [x] **Step 7: Implement `src/lib/env.ts`**
 
 ```ts
 export function prefersReducedMotion(): boolean {
@@ -204,12 +216,12 @@ export function hasWebGL(): boolean {
 }
 ```
 
-- [ ] **Step 8: Run the test, verify it passes**
+- [x] **Step 8: Run the test, verify it passes**
 
 Run: `npx vitest run src/lib/env.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 9: Write `src/styles/index.css` with the token set**
+- [x] **Step 9: Write `src/styles/index.css` with the token set**
 
 Values copied from the design source lines 10–29 and the Global Constraints above.
 
@@ -260,7 +272,7 @@ Values copied from the design source lines 10–29 and the Global Constraints ab
 }
 ```
 
-- [ ] **Step 10: Write `src/styles/atmosphere.css`**
+- [x] **Step 10: Write `src/styles/atmosphere.css`**
 
 Port the keyframes and effect rules verbatim from design source lines 17–27. Keep the class names but drop the `v5-` id-based selectors in favour of classes:
 
@@ -346,7 +358,7 @@ Port the keyframes and effect rules verbatim from design source lines 17–27. K
 }
 ```
 
-- [ ] **Step 11: Write `index.html` with font loading and a no-JS note**
+- [x] **Step 11: Write `index.html` with font loading and a no-JS note**
 
 ```html
 <!doctype html>
@@ -367,7 +379,7 @@ Port the keyframes and effect rules verbatim from design source lines 17–27. K
 </html>
 ```
 
-- [ ] **Step 12: Minimal `src/App.tsx` and `src/main.tsx` so the dev server boots**
+- [x] **Step 12: Minimal `src/App.tsx` and `src/main.tsx` so the dev server boots**
 
 ```tsx
 // src/App.tsx
@@ -390,12 +402,12 @@ createRoot(document.getElementById('root')!).render(
 );
 ```
 
-- [ ] **Step 13: Verify the dev server and the production build**
+- [x] **Step 13: Verify the dev server and the production build**
 
 Run: `npm run dev` — page loads, background is `#0A0807`.
 Run: `npm run build` — succeeds, and `dist/index.html` references assets with `./` prefixes.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add -A
@@ -426,7 +438,7 @@ The only substantial pure logic in the app. Behaviour is defined by the design s
   export function parseCommand(raw: string): CommandResult;
   ```
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `src/console/commands.test.ts`:
 
@@ -502,12 +514,12 @@ describe('parseCommand', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/console/commands.test.ts`
 Expected: FAIL — cannot resolve `./commands`.
 
-- [ ] **Step 3: Implement `src/console/commands.ts`**
+- [x] **Step 3: Implement `src/console/commands.ts`**
 
 ```ts
 export const COLORS = {
@@ -581,12 +593,12 @@ export function parseCommand(raw: string): CommandResult {
 }
 ```
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/console/commands.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/console/commands.ts src/console/commands.test.ts
@@ -618,7 +630,7 @@ The design keeps a rolling buffer of the last 6 lines (source lines 310–316, `
     | { type: 'toggleSound' };
   ```
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `src/console/useConsole.test.ts`:
 
@@ -676,12 +688,12 @@ describe('consoleReducer', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/console/useConsole.test.ts`
 Expected: FAIL — cannot resolve `./useConsole`.
 
-- [ ] **Step 3: Implement the reducer in `src/console/useConsole.ts`**
+- [x] **Step 3: Implement the reducer in `src/console/useConsole.ts`**
 
 ```ts
 import { useCallback, useReducer } from 'react';
@@ -717,12 +729,12 @@ export function consoleReducer(state: ConsoleState, action: ConsoleAction): Cons
 }
 ```
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/console/useConsole.test.ts`
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Add the `useConsole` hook below the reducer in the same file**
+- [x] **Step 5: Add the `useConsole` hook below the reducer in the same file**
 
 `onRoute` is injected so the hook stays free of scroll concerns — Task 5 supplies the Lenis-backed implementation.
 
@@ -771,7 +783,7 @@ export function useConsole(onRoute: (chapterId: string) => void) {
 }
 ```
 
-- [ ] **Step 6: Run the whole suite, then commit**
+- [x] **Step 6: Run the whole suite, then commit**
 
 ```bash
 npx vitest run
@@ -830,7 +842,7 @@ Content extracted verbatim from the design source. Chapter copy is at lines 73�
   export const CERTIFICATIONS: readonly string[];
   ```
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `src/data/data.test.ts`. These guard the invariants other tasks depend on — chapter ids matching the console's routes, and each project having exactly the three bullets the layout is designed around.
 
@@ -904,12 +916,12 @@ describe('contact', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/data/data.test.ts`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Write `src/data/chapters.ts`**
+- [x] **Step 3: Write `src/data/chapters.ts`**
 
 ```ts
 export type Chapter = { id: string; hudLabel: string; screenLabel: string };
@@ -927,7 +939,7 @@ export const CHAPTERS: readonly Chapter[] = [
 export const CHAPTER_IDS = CHAPTERS.map((c) => c.id);
 ```
 
-- [ ] **Step 4: Write `src/data/experience.ts`**
+- [x] **Step 4: Write `src/data/experience.ts`**
 
 Values transcribed from design source lines 107–121. `startCol`/`span` are the CSS grid columns of the 9-column 2018–2026 timeline.
 
@@ -995,7 +1007,7 @@ export const STATS: readonly Stat[] = [
 ] as const;
 ```
 
-- [ ] **Step 5: Write `src/data/projects.ts`**
+- [x] **Step 5: Write `src/data/projects.ts`**
 
 Copy transcribed verbatim from design source lines 123–239.
 
@@ -1053,7 +1065,7 @@ export const PROJECTS: readonly Project[] = [
 ] as const;
 ```
 
-- [ ] **Step 6: Write `src/data/checklist.ts`**
+- [x] **Step 6: Write `src/data/checklist.ts`**
 
 Transcribe all six items from design source lines 240–266. The first three are shown here; read the file for items 4–6 and transcribe them the same way.
 
@@ -1093,7 +1105,7 @@ export const REPORT_FIELDS: readonly ReportField[] = [
 ] as const;
 ```
 
-- [ ] **Step 7: Write `src/data/contact.ts`**
+- [x] **Step 7: Write `src/data/contact.ts`**
 
 From design source lines 267–283.
 
@@ -1121,12 +1133,12 @@ export const CERTIFICATIONS: readonly string[] = [
 ] as const;
 ```
 
-- [ ] **Step 8: Run the test, verify it passes**
+- [x] **Step 8: Run the test, verify it passes**
 
 Run: `npx vitest run src/data/data.test.ts`
 Expected: PASS.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/data
@@ -1148,7 +1160,7 @@ git commit -m "Add typed content data modules"
   export function useSmoothScroll(): { scrollTo: (chapterId: string) => void };
   ```
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Lenis is mocked — this test verifies wiring, not scroll physics.
 
@@ -1189,12 +1201,12 @@ describe('useSmoothScroll', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/motion/useSmoothScroll.test.ts`
 Expected: FAIL — cannot resolve `./useSmoothScroll`.
 
-- [ ] **Step 3: Implement `src/motion/useSmoothScroll.ts`**
+- [x] **Step 3: Implement `src/motion/useSmoothScroll.ts`**
 
 One RAF loop: Lenis is driven by `gsap.ticker` rather than its own `requestAnimationFrame`, so scroll and tweens stay on the same clock.
 
@@ -1242,12 +1254,12 @@ export function useSmoothScroll() {
 }
 ```
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/motion/useSmoothScroll.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/motion/useSmoothScroll.ts src/motion/useSmoothScroll.test.ts
@@ -1274,7 +1286,7 @@ Ports the motion behaviours from design source lines 465–620, minus the canvas
   export function useMagnetic(): RefObject<HTMLAnchorElement>;
   ```
 
-- [ ] **Step 1: Write the failing test for reduced-motion gating**
+- [x] **Step 1: Write the failing test for reduced-motion gating**
 
 This is the spec's §7 guarantee, so it gets a test.
 
@@ -1330,12 +1342,12 @@ describe('useReveal', () => {
 
 Rename the test file to `useReveal.test.tsx` since it contains JSX.
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/motion/useReveal.test.tsx`
 Expected: FAIL — cannot resolve `./useReveal`.
 
-- [ ] **Step 3: Implement `src/motion/useReveal.ts`**
+- [x] **Step 3: Implement `src/motion/useReveal.ts`**
 
 ```ts
 import { type RefObject } from 'react';
@@ -1369,24 +1381,24 @@ export function useReveal(scope: RefObject<HTMLElement | null>) {
 }
 ```
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/motion/useReveal.test.tsx`
 Expected: PASS.
 
-- [ ] **Step 5: Implement `useSplitText.ts`**
+- [x] **Step 5: Implement `useSplitText.ts`**
 
 Port `split()` and `charTween()` from design source lines 465–500. Wraps each word in an `overflow: hidden` inline-block, each character in a `.deck-char` span, then tweens `yPercent: 108 → 0` with a 0.014s stagger and `expo.out`. The wrapper must set `aria-label` to the original text and `aria-hidden` on the split spans, so the headline stays one string to a screen reader.
 
-- [ ] **Step 6: Implement `useCounter.ts`**
+- [x] **Step 6: Implement `useCounter.ts`**
 
 Counts to `value` over 1.4s with `power2.out`, honouring `decimals` (99.5 renders one decimal place, the rest render integers), triggered by ScrollTrigger at `top 90%`. Under reduced motion it writes the final value immediately.
 
-- [ ] **Step 7: Implement `useMagnetic.ts`**
+- [x] **Step 7: Implement `useMagnetic.ts`**
 
 Port `ambient()`'s magnetic logic from design source lines 447–462: on `pointermove`, if the cursor is within `max(width, 170)` px, tween `x: dx * 0.22, y: dy * 0.3` with `power3.out`; otherwise return to origin with `elastic.out(1, 0.5)`. Skip entirely under reduced motion. Use one shared listener registered `{ passive: true }`.
 
-- [ ] **Step 8: Run the suite and commit**
+- [x] **Step 8: Run the suite and commit**
 
 ```bash
 npx vitest run
@@ -1411,7 +1423,7 @@ Design source lines 36–52.
   export function useChapterTracking(): { activeId: string; progress: number };
   ```
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -1442,31 +1454,31 @@ describe('StatusStrip', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/hud/StatusStrip.test.tsx`
 Expected: FAIL — cannot resolve `./StatusStrip`.
 
-- [ ] **Step 3: Implement `StatusStrip.tsx`**
+- [x] **Step 3: Implement `StatusStrip.tsx`**
 
 Port the markup from design source lines 37–41 into Tailwind utilities. Fixed strip, 38px tall, `z-50`, gradient background `linear-gradient(180deg, rgba(10,8,7,0.94), rgba(10,8,7,0.55))`, bottom border `rgba(239,230,218,0.12)`, mono 10px uppercase with `0.18em` tracking. Left: a `#8FB877` dot with `animation: deck-blink 2.4s infinite` plus "Available for assignment". Centre: the active chapter label in ember, truncating. Right: `<span data-testid="hud-clock">` driven by a 1s interval using `toLocaleTimeString('en-GB', { hour12: false })`, then "NBO · UTC+3".
 
 The strip is decorative chrome duplicating information available in the page, so the wrapper keeps `aria-hidden="true"` as the design has it — except the clock, which is `aria-hidden` too. Nothing here is the only route to any content.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/hud/StatusStrip.test.tsx`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Implement `useChapterTracking.ts`**
+- [x] **Step 5: Implement `useChapterTracking.ts`**
 
 One ScrollTrigger per `section[data-chapter]` with `start: 'top 55%'`, `end: 'bottom 45%'`, setting `activeId` on toggle; plus one page-level trigger from `top top` to `bottom bottom` reporting `progress`. Ports design source lines 552–580.
 
-- [ ] **Step 6: Implement `AltitudeLadder.tsx` and `CornerBrackets.tsx`**
+- [x] **Step 6: Implement `AltitudeLadder.tsx` and `CornerBrackets.tsx`**
 
 Ladder: fixed left rail 56px wide starting below the strip, a 1px 52%-height track in `rgba(239,230,218,0.14)`, a 7px ember dot positioned at `top: ${progress * 100}%` with `box-shadow: 0 0 14px 3px rgba(232,163,61,0.5)`, and a 3-digit zero-padded percentage below it. Brackets: three 16px L-shapes in `rgba(232,163,61,0.4)` at the positions in design source lines 49–51.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/components/hud src/motion/useChapterTracking.ts
@@ -1487,7 +1499,7 @@ Design source lines 53–72.
 - Consumes: `useConsole` (Task 3), `useSmoothScroll` (Task 5)
 - Produces: `<Console onRoute={(id: string) => void} />`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect, vi } from 'vitest';
@@ -1537,12 +1549,12 @@ describe('Console', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/console/Console.test.tsx`
 Expected: FAIL — cannot resolve `./Console`.
 
-- [ ] **Step 3: Implement `ConsoleLog.tsx` then `Console.tsx`**
+- [x] **Step 3: Implement `ConsoleLog.tsx` then `Console.tsx`**
 
 Fixed to the bottom, `z-[62]`, top border `rgba(239,230,218,0.14)`, background `linear-gradient(0deg, rgba(10,8,7,0.97), rgba(10,8,7,0.82))`. Log area `max-h-[150px]`, bottom-aligned, each line mono 11.5px with the mark in `#5F534B`. Form row: `DECK ›` prompt in rust, a bare input (`all: unset` equivalent — mono 13px, bone, ember caret) with `aria-label="Flight deck command line"` and placeholder `type help — or press / anywhere`, then the four chips (`help`, `profile`, `hire`, `snd on|off`).
 
@@ -1550,12 +1562,12 @@ Keyboard: a `keydown` listener that focuses the input on `/` when the target is 
 
 Optional WebAudio blips port from lines 317–327 and stay off by default.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/console/Console.test.tsx`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/console/Console.tsx src/console/ConsoleLog.tsx src/console/Console.test.tsx
@@ -1573,15 +1585,15 @@ git commit -m "Add command console UI with keyboard navigation"
 - Consumes: `prefersReducedMotion`
 - Produces: three prop-less components
 
-- [ ] **Step 1: Implement the three components**
+- [x] **Step 1: Implement the three components**
 
 `Grain` and `Vignette` are single `aria-hidden` divs carrying `.deck-grain` / `.deck-vignette` from Task 1's CSS. `Spotlight` carries `.deck-spotlight` and, on `pointermove`, sets opacity to 1 and follows the cursor via `gsap.quickTo(el, 'left', { duration: 0.55, ease: 'power3' })` and the same for `'top'` — ported from design source lines 440–446. It returns `null` under reduced motion.
 
-- [ ] **Step 2: Verify in the browser**
+- [x] **Step 2: Verify in the browser**
 
 Run: `npm run dev`. Grain is visible as fine noise; the vignette darkens the edges; the spotlight follows the cursor. Toggle OS reduced-motion and confirm grain and spotlight disappear.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/components/atmosphere
@@ -1603,7 +1615,7 @@ Design source lines 73–101. Portrait already in the repo at `assets/brian-spea
 - Consumes: `useSplitText`, `useMagnetic`
 - Produces: `<Arrival />`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -1638,12 +1650,12 @@ describe('Arrival', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/chapters/Arrival.test.tsx`
 Expected: FAIL — cannot resolve `./Arrival`.
 
-- [ ] **Step 3: Move the portrait and implement the component**
+- [x] **Step 3: Move the portrait and implement the component**
 
 ```bash
 mkdir -p src/assets && git mv assets/brian-speaking.png src/assets/brian-speaking.png && rmdir assets
@@ -1658,16 +1670,16 @@ Port lines 73–101. Section is `min-h-screen`, `padding: 78px 40px 120px 76px`,
 - Two CTAs, both `data-magnetic`, plus the "or press / to fly it by keyboard" hint.
 - Portrait panel: `max-width: 340px`, 1px border, `overflow: hidden`; image at `height: 108%`, `object-position: 52% 14%`, `filter: saturate(0.8) contrast(1.06) brightness(0.9)`; then the bottom gradient scrim, the `.deck-scanlines` overlay, the sweeping band (`deck-scan 7.5s linear infinite`), the 50px radar disc with its conic sweep and blinking centre, and the `PHOTO / OTIENO_B` / `NBO` caption row.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/chapters/Arrival.test.tsx`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Compare against the design in the browser**
+- [x] **Step 5: Compare against the design in the browser**
 
 Run: `npm run dev`. Open `design/portfolio-v5-flight-deck.dc.html` side by side and check the headline scale, the portrait crop and the aura position match.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/chapters/Arrival.tsx src/components/chapters/Arrival.test.tsx src/assets
@@ -1687,7 +1699,7 @@ Design source lines 103–122.
 **Interfaces:**
 - Consumes: `LEGS`, `STATS` (Task 4), `useCounter`, `useSplitText`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -1726,21 +1738,21 @@ describe('FlightProfile', () => {
 
 The last test enforces the Global Constraint that content is visible by default.
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/chapters/FlightProfile.test.tsx`
 Expected: FAIL — cannot resolve `./FlightProfile`.
 
-- [ ] **Step 3: Implement the component**
+- [x] **Step 3: Implement the component**
 
 Background `--color-deck-raised`. A header row (`Flight profile · 2018 — 2026` in ember, `6 legs logged` right), a `data-split` h2 at `clamp(30px, 4.4vw, 64px)`, then the timeline: a 9-column year header followed by one row per `LEGS` entry using `grid-template-columns: 190px minmax(0,1fr) 96px`. Each bar is `grid-column: ${startCol} / span ${span}` with `linear-gradient(90deg, ...leg.gradient)` and `transform-origin: 0 50%`. Below, the four `STATS` tiles in a `repeat(auto-fit, minmax(190px, 1fr))` grid with a 1px gap over a `rgba(239,230,218,0.1)` background to draw the dividers.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/chapters/FlightProfile.test.tsx`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/chapters/FlightProfile.tsx src/components/chapters/FlightProfile.test.tsx
@@ -1763,7 +1775,7 @@ git commit -m "Add chapter 01 Flight profile"
   ```
   `children` is the bespoke mockup. The component places text and mockup according to `project.textSide`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -1806,21 +1818,21 @@ describe('CaseStudy', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/chapters/CaseStudy.test.tsx`
 Expected: FAIL — cannot resolve `./CaseStudy`.
 
-- [ ] **Step 3: Implement the component**
+- [x] **Step 3: Implement the component**
 
 Section: `min-h-screen`, `padding: 78px 40px 120px 76px`, auto-fit grid `minmax(min(100%, 400px), 1fr)` with 48px gap, `align-items: center`, and `data-chapter` set from the matching `CHAPTERS` entry. Text side: leg label in mono uppercase dim, `data-split` h2, lede paragraph in `--color-muted`, then three `✓` bullets in `--color-go` and the `→` outcome line in ember.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/chapters/CaseStudy.test.tsx`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/chapters/CaseStudy.tsx src/components/chapters/CaseStudy.test.tsx
@@ -1839,7 +1851,7 @@ Each is a static visual, hand-ported. No shared abstraction — they share a voc
 - Create: `src/components/chapters/mockups/TicketQueuePhone.tsx` (design lines 208–238)
 - Test: `src/components/chapters/mockups/mockups.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -1885,23 +1897,23 @@ describe('TicketQueuePhone', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/chapters/mockups/mockups.test.tsx`
 Expected: FAIL — modules not found.
 
-- [ ] **Step 3: Port the three mockups**
+- [x] **Step 3: Port the three mockups**
 
 Read each line range and translate inline styles to Tailwind, keeping exact colours and sizes. All three are decorative product illustrations: wrap each in `role="img"` with an `aria-label` describing it in one sentence (for example `aria-label="Mockup of a CBC competency assessment sheet"`), and mark the internal text `aria-hidden` so a screen reader is not read a table of invented learner names.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/chapters/mockups/mockups.test.tsx`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 5: Wire the three case study chapters into `App.tsx` and check them in the browser**
+- [x] **Step 5: Wire the three case study chapters into `App.tsx` and check them in the browser**
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/chapters/mockups
@@ -1918,7 +1930,7 @@ Design source lines 240–266. **The report copy is a placeholder — see spec �
 - Create: `src/components/chapters/Checklist.tsx`
 - Test: `src/components/chapters/Checklist.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -1951,21 +1963,21 @@ describe('Checklist', () => {
 
 The third test matters: there is no backend, so the report must never look submittable.
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/chapters/Checklist.test.tsx`
 Expected: FAIL — cannot resolve `./Checklist`.
 
-- [ ] **Step 3: Implement the component**
+- [x] **Step 3: Implement the component**
 
 Background `--color-deck-raised`. Left: `Leg 05 · standard procedure`, the `data-split` headline "Aviation gave me a checklist habit. I never shipped it away.", the KCAA paragraph, then the six `CHECKLIST` items as `data-anim="check"` rows — ember `✓`, bone title, dim body, `CHECKED` chip on the right. Right: the "Occurrence report / FORM 05—A" panel with the four numbered fields rendered as static text, and the closing line "Send me the four answers and I'll set this in type — no failure invented on your behalf."
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/chapters/Checklist.test.tsx`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/chapters/Checklist.tsx src/components/chapters/Checklist.test.tsx
@@ -1984,7 +1996,7 @@ Design source lines 267–283.
 - Create: `src/components/chapters/Clearance.tsx`
 - Test: `src/components/chapters/Clearance.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -2024,21 +2036,21 @@ describe('Clearance', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/chapters/Clearance.test.tsx`
 Expected: FAIL — cannot resolve `./Clearance`.
 
-- [ ] **Step 3: Implement the component**
+- [x] **Step 3: Implement the component**
 
 Left: `Leg 06 · clearance to contact`, the `data-split` headline, the hiring paragraph, then `EDUCATION` and `CERTIFICATIONS` as a dim mono list. Right: the `CONTACT` rows as a bordered stack, label in dim mono, value as a link in ember. External links get `target="_blank" rel="noopener noreferrer"`.
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/chapters/Clearance.test.tsx`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/chapters/Clearance.tsx src/components/chapters/Clearance.test.tsx
@@ -2053,7 +2065,7 @@ git commit -m "Add chapter 06 Clearance"
 - Modify: `src/App.tsx`
 - Test: `src/App.test.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -2075,12 +2087,12 @@ describe('App', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/App.test.tsx`
 Expected: FAIL — chapters not composed.
 
-- [ ] **Step 3: Implement `App.tsx`**
+- [x] **Step 3: Implement `App.tsx`**
 
 ```tsx
 import { useRef } from 'react';
@@ -2148,16 +2160,16 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/App.test.tsx`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 5: Full-page check in the browser**
+- [x] **Step 5: Full-page check in the browser**
 
 Run: `npm run dev`. Scroll the whole page: the HUD chapter readout changes at each section, the ladder tracks progress, headlines split and rise, career bars grow, stats count up, magnetic CTAs respond. Type `open 04` in the console and confirm it scrolls there. Press `j` and `k` and confirm chapter stepping.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/App.tsx src/App.test.tsx
@@ -2180,7 +2192,7 @@ Spec §8 — the single three.js effect, lazily loaded, mounted only when suppor
 - Consumes: `hasWebGL`, `prefersReducedMotion` (Task 1)
 - Produces: `<HeroAtmosphere />` — renders the CSS aura fallback or lazily mounts `EmberField`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -2213,12 +2225,12 @@ describe('HeroAtmosphere', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, verify it fails**
+- [x] **Step 2: Run the test, verify it fails**
 
 Run: `npx vitest run src/components/atmosphere/HeroAtmosphere.test.tsx`
 Expected: FAIL — cannot resolve `./HeroAtmosphere`.
 
-- [ ] **Step 3: Implement `HeroAtmosphere.tsx`**
+- [x] **Step 3: Implement `HeroAtmosphere.tsx`**
 
 ```tsx
 import { lazy, Suspense, useEffect, useState } from 'react';
@@ -2264,24 +2276,24 @@ export function HeroAtmosphere() {
 }
 ```
 
-- [ ] **Step 4: Run the test, verify it passes**
+- [x] **Step 4: Run the test, verify it passes**
 
 Run: `npx vitest run src/components/atmosphere/HeroAtmosphere.test.tsx`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 5: Implement `EmberField.tsx`**
+- [x] **Step 5: Implement `EmberField.tsx`**
 
 A `<Canvas>` from `@react-three/fiber` positioned absolutely behind the hero content, `dpr={[1, 1.5]}` to cap cost on high-density screens, containing one fullscreen plane with a `shaderMaterial`. The fragment shader layers two domain-warped fbm noise fields in `#C0603A` and `#E8A33D` over transparent, advanced by `uTime` and nudged by `uPointer`. `useFrame` advances time and lerps the pointer. Match the CSS aura's placement and intensity so the fallback and the upgrade read as the same design.
 
-- [ ] **Step 6: Use it in `Arrival.tsx`**
+- [x] **Step 6: Use it in `Arrival.tsx`**
 
 Replace the hand-written aura div from Task 10 with `<HeroAtmosphere />`. Re-run `npx vitest run src/components/chapters/Arrival.test.tsx` — still PASS.
 
-- [ ] **Step 7: Verify the chunk split**
+- [x] **Step 7: Verify the chunk split**
 
 Run: `npm run build`. Confirm the output lists a separate `three` chunk and that `index.html` does not preload it.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/components/atmosphere src/components/chapters/Arrival.tsx
@@ -2303,9 +2315,9 @@ The source is a Claude Design canvas document: a `<doc-page>` shell from `doc-pa
 - Consumes: nothing from earlier tasks. This page is deliberately standalone — it must print correctly with no JS and no bundled CSS.
 - Produces: the file that the console's `resume` command and the Clearance chapter's `DOCUMENT` row both link to as `./resume.html`.
 
-- [ ] **Step 1: Read the source.** Read `design/brian-otieno-resume.dc.html` end to end.
+- [x] **Step 1: Read the source.** Read `design/brian-otieno-resume.dc.html` end to end.
 
-- [ ] **Step 2: Port it to plain HTML.** Produce `public/resume.html` as a complete document (`<!doctype html>`, `<html lang="en">`, `<head>` with `<meta charset>`, `<meta name="viewport">`, `<title>Brian Otieno — Résumé</title>`, and the Google Fonts links for Newsreader and IBM Plex Sans copied from the source's `<helmet>` block).
+- [x] **Step 2: Port it to plain HTML.** Produce `public/resume.html` as a complete document (`<!doctype html>`, `<html lang="en">`, `<head>` with `<meta charset>`, `<meta name="viewport">`, `<title>Brian Otieno — Résumé</title>`, and the Google Fonts links for Newsreader and IBM Plex Sans copied from the source's `<helmet>` block).
 
   Transform rules, applied mechanically:
   - `<x-dc>` and `<helmet>` wrappers: drop the wrappers, hoist the `<head>` contents.
@@ -2316,22 +2328,22 @@ The source is a Claude Design canvas document: a `<doc-page>` shell from `doc-pa
   - Inline `style="..."` attributes: keep them as-is. They are the design. Do not refactor them into classes, do not "clean them up", do not substitute Tailwind.
   - `style-hover="..."` attributes, if any: move to a `<style>` rule in the head using a generated class; the visual result must be identical.
 
-- [ ] **Step 3: Add print rules.** In a `<style>` block: `@media print { body { background: #fff } .page { box-shadow: none; margin: 0; padding: 0; max-width: none } }`. Keep the source's existing `break-inside: avoid` on each experience entry. No `position: fixed`, no viewport units (`vh`/`vw`) anywhere in the file — both break paged output.
+- [x] **Step 3: Add print rules.** In a `<style>` block: `@media print { body { background: #fff } .page { box-shadow: none; margin: 0; padding: 0; max-width: none } }`. Keep the source's existing `break-inside: avoid` on each experience entry. No `position: fixed`, no viewport units (`vh`/`vw`) anywhere in the file — both break paged output.
 
-- [ ] **Step 4: Add a back link.** A single unobtrusive link at the top, `<a href="./index.html">&larr; Back to portfolio</a>`, styled in `#1f3a5f` IBM Plex Sans at 8.4pt, inside a wrapper carrying `class="no-print"` with `@media print { .no-print { display: none } }`. This is the one element not in the source, and it exists because a standalone page with no way back is a dead end.
+- [x] **Step 4: Add a back link.** A single unobtrusive link at the top, `<a href="./index.html">&larr; Back to portfolio</a>`, styled in `#1f3a5f` IBM Plex Sans at 8.4pt, inside a wrapper carrying `class="no-print"` with `@media print { .no-print { display: none } }`. This is the one element not in the source, and it exists because a standalone page with no way back is a dead end.
 
-- [ ] **Step 5: Verify the content matches.** Diff the rendered text against the source: every employer, title, date range, and bullet must appear once, in the source's order, with the source's wording. Confirm the six experience entries (Lloyd Cooper Consulting Group, Integrated Spatial Solutions, Bakpage Labs, Eclectics International, Cape Media/TV47, Kenya Civil Aviation Authority), the technical-skills grid, the three selected projects, the four education entries, and the two certifications are all present.
+- [x] **Step 5: Verify the content matches.** Diff the rendered text against the source: every employer, title, date range, and bullet must appear once, in the source's order, with the source's wording. Confirm the six experience entries (Lloyd Cooper Consulting Group, Integrated Spatial Solutions, Bakpage Labs, Eclectics International, Cape Media/TV47, Kenya Civil Aviation Authority), the technical-skills grid, the three selected projects, the four education entries, and the two certifications are all present.
 
   Note for the record: spec §12.4 flags two résumé-vs-flight-deck discrepancies (employer name, Cisco certification). On **this** page the résumé's own wording is authoritative — do not import the flight deck's variants.
 
-- [ ] **Step 6: Verify it builds and prints.** Run `npm run build`, confirm `dist/resume.html` exists byte-identical to the source file, and open `dist/index.html` and `dist/resume.html` from a static server to confirm the links resolve both ways.
+- [x] **Step 6: Verify it builds and prints.** Run `npm run build`, confirm `dist/resume.html` exists byte-identical to the source file, and open `dist/index.html` and `dist/resume.html` from a static server to confirm the links resolve both ways.
 
 ```bash
 npm run build
 test -f dist/resume.html && diff public/resume.html dist/resume.html && echo "resume.html ships verbatim"
 ```
 
-- [ ] **Step 7: Commit.**
+- [x] **Step 7: Commit.**
 
 ```bash
 git add public/resume.html design/brian-otieno-resume.dc.html
@@ -2348,7 +2360,7 @@ git commit -m "feat: add printable resume page"
 - Create: `public/.htaccess`, `DEPLOY.md`
 - Modify: `src/components/chapters/Arrival.tsx` (responsive image sources)
 
-- [ ] **Step 1: Write `public/.htaccess`**
+- [x] **Step 1: Write `public/.htaccess`**
 
 ```apache
 # Compression
@@ -2377,7 +2389,7 @@ git commit -m "feat: add printable resume page"
 </IfModule>
 ```
 
-- [ ] **Step 2: Generate AVIF and WebP portrait variants**
+- [x] **Step 2: Generate AVIF and WebP portrait variants**
 
 ```bash
 npx @squoosh/cli --avif auto --webp auto -d src/assets src/assets/brian-speaking.png
@@ -2385,7 +2397,7 @@ npx @squoosh/cli --avif auto --webp auto -d src/assets src/assets/brian-speaking
 
 Then serve them from a `<picture>` in `Arrival.tsx` with the PNG as the final `<img>` fallback. Note the source is 506×627, which is adequate at the design's 340px display width but only ~1.5× on a retina screen — if a higher-resolution original exists, use it.
 
-- [ ] **Step 3: Build and verify the output is relocatable**
+- [x] **Step 3: Build and verify the output is relocatable**
 
 ```bash
 npm run build
@@ -2398,17 +2410,17 @@ Expected: every path starts with `./`. Then serve `dist/` from a subdirectory to
 npx serve dist
 ```
 
-- [ ] **Step 4: Write `DEPLOY.md`**
+- [x] **Step 4: Write `DEPLOY.md`**
 
 Document: run `npm run build`; open cPanel → File Manager → `public_html`; delete previous contents; upload the *contents* of `dist/` (not the folder itself); confirm `.htaccess` uploaded, since File Manager hides dotfiles until "Show Hidden Files" is enabled; hard-refresh to bypass the cached old `index.html`.
 
-- [ ] **Step 5: Run the full suite and build one last time**
+- [x] **Step 5: Run the full suite and build one last time**
 
 ```bash
 npx vitest run && npm run build
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add public/.htaccess DEPLOY.md src/assets src/components/chapters/Arrival.tsx
@@ -2422,3 +2434,51 @@ git commit -m "Add deployment config, responsive portrait and deploy guide"
 **Spec coverage:** §3 stack → Task 1. §4 tokens → Task 1 Step 9. §5 structure → Tasks 4, 12, 13. §6 styling → Tasks 1, 10–15. §7 motion → Tasks 5, 6, 7. §8 three.js → Task 17. §9 testing → Tasks 2, 3, 6 and per-component tests throughout. §10 deployment → Task 19. §11 removals → Task 1 Step 1. §12.1 résumé → Task 18 (blocked, marked). §12.2 portrait → resolved, asset in repo. §12.3 report placeholder → Task 14, guarded by a test that it renders no form. §12.4 discrepancies → carried into `experience.ts` and `contact.ts` as the design's wording, pending Brian's confirmation.
 
 **Known gaps, deliberate:** Task 6 Steps 5–7 and Task 13 Step 3 describe ports from specific line ranges rather than reproducing the code — the vendored design file is the authority and copying it into the plan would duplicate the source of truth. Task 17 Step 5's shader is described, not written, because its parameters need tuning against the live page.
+
+---
+
+## Post-plan changes
+
+Work done on the branch after Task 19 closed. Each is a shipped commit; the
+task bodies above were not rewritten to match, so this list is the delta.
+
+**Correctness and robustness**
+
+- `Header` directives in `public/.htaccess` are every one of them guarded by
+  `<IfModule mod_headers.c>` — an unguarded one 500s the whole site on a host
+  without the module rather than degrading. `scripts/htaccessGuard.mjs`
+  enforces it at build time, and matches Apache's case-insensitivity.
+- The reduced-motion fallback no longer smooth-scrolls; console routing under
+  `prefers-reduced-motion` jumps.
+- Console log lines are keyed by identity rather than array position.
+- `scripts/check-bundle.mjs` also asserts `dist/resume.html`'s shape: present,
+  free of unresolved canvas-document syntax, print-safe, all six employers
+  intact. It is a hand-written file Vite copies through, so the unit suite
+  cannot see it.
+
+**Design fidelity**
+
+- Chapter 00 gained the design's load-time intro timeline, and the hero aura
+  scrub survives the swap to the WebGL ember field.
+- The seven `data-anim` families from spec §7 that had gone unimplemented are
+  wired, and the `data-row` / `data-bar-v` markers are ported into all three
+  mockups.
+- The hero portrait was restored from the intact original (`speaker.png`,
+  506 × 627) after an earlier import truncated it; AVIF and WebP variants were
+  regenerated from that source.
+
+**Content**
+
+- Spec §12.4's four discrepancies are resolved with Brian's own answers — the
+  résumé wins in each case — and carried into `experience.ts`, `contact.ts`
+  and `resume.html`. See the spec section for which answer settled each.
+- Spec §12.3 remains open by design: chapter 05's occurrence report still ships
+  the placeholder prompts. Nothing will be invented to fill it.
+
+**Deployment**
+
+- `DEPLOY.md` became executable rather than descriptive: the zip workaround for
+  cPanel File Manager's file-only uploader, the Show-Hidden-Files step that
+  otherwise strands a stale `.htaccess`, a post-extract verification list, and
+  a failure-mode section. Spec §2's no-JS claim was settled in the same pass —
+  prerendering deferred, `<noscript>` routing to `resume.html` instead.

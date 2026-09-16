@@ -1,7 +1,9 @@
 # Portfolio v5 "Flight Deck" — Design Spec
 
 Date: 2026-09-04
-Status: approved for planning
+Status: implemented — see `docs/superpowers/plans/2026-09-04-portfolio-flight-deck.md`
+for the build record and `README.md` for the code as it now stands. Everything
+here shipped except §12.3, which stays open by design.
 Source design: Claude Design project `df2fbf8d-3371-4dc4-bb6f-a8c40c433eaa`,
 file `Portfolio v5 Flight Deck.dc.html`
 
@@ -319,15 +321,24 @@ palette (`#1f3a5f` navy, `#141414`, `#2b2b2b`, `#4a4a4a`, `#6b6b6b`,
 standalone `public/resume.html` ported from it verbatim — no PDF, since
 none exists and the page prints to one from any browser.
 
+Shipped. `scripts/check-bundle.mjs` asserts the built page's shape on every
+build, since Vite copies the file through untouched and the unit suite cannot
+see it.
+
 ### 12.2 Portrait asset — resolved
 
 `images/brian-speaking.png` was retrieved and decoded to `assets/brian-speaking.png`
-(506 × 627, RGBA, 192 KB). It is small — roughly 1.5× the design's 340 px
-display width — so it is adequate but not generous. A higher-resolution
-original would improve the Arrival chapter on dense displays; nothing is
-blocked without one.
+(506 × 627). It is small — roughly 1.5× the design's 340 px display width — so
+it is adequate but not generous. A higher-resolution original would improve the
+Arrival chapter on dense displays; nothing is blocked without one.
 
-### 12.3 Occurrence report is an unfilled placeholder
+The first import was truncated and briefly shipped as a crop. The intact
+original was on disk untracked as `src/assets/speaker.png` — same dimensions,
+pixel-identical across the rows the truncated copy kept — and the hero now uses
+it at the design's full frame, with the AVIF (16 kB) and WebP (20 kB) variants
+regenerated from it.
+
+### 12.3 Occurrence report is an unfilled placeholder — open
 
 Chapter 05's "Occurrence report / FORM 05—A" is not finished content. Its
 four fields read as prompts addressed to Brian:
