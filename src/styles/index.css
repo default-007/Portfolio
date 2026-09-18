@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+@import './atmosphere.css';
+
+@theme {
+  --color-deck: #0a0807;
+  --color-deck-raised: #0d0a09;
+  --color-ember: #e8a33d;
+  --color-ember-bright: #f5bd62;
+  --color-rust: #c0603a;
+  --color-rust-bright: #d4703f;
+  --color-bone: #fbf7f1;
+  --color-body: #efe6da;
+  --color-muted: #b8aaa0;
+  --color-dim-0: #9c8c7e;
+  --color-dim-1: #8a7a6d;
+  --color-dim-2: #7e6f63;
+  --color-dim-3: #6e6058;
+  --color-dim-4: #5f534b;
+  --color-go: #8fb877;
+  --color-horizon: #8a9fb8;
+
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    background: var(--color-deck);
+    color: var(--color-body);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+  a {
+    color: var(--color-ember);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-ember-bright);
+  }
+  ::selection {
+    background: var(--color-rust);
+    color: var(--color-bone);
+  }
+}

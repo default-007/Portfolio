@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,300;0,6..72,400;1,6..72,300&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0A0807;overflow-x:hidden}
+a{color:#E8A33D;text-decoration:none}
+a:hover{color:#F5BD62}
+::selection{background:#C0603A;color:#FBF7F1}
+@keyframes v5-blink{0%,45%{opacity:1}50%,95%{opacity:.2}100%{opacity:1}}
+@keyframes v5-sweep{to{transform:rotate(360deg)}}
+@keyframes v5-drift{0%{transform:translate3d(-4%,-2%,0) scale(1)}50%{transform:translate3d(5%,4%,0) scale(1.16)}100%{transform:translate3d(-4%,-2%,0) scale(1)}}
+@keyframes v5-scan{0%{transform:translateY(-120%)}100%{transform:translateY(600%)}}
+#v5-grain{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+#v5-spot{position:fixed;top:0;left:0;width:720px;height:720px;margin:-360px 0 0 -360px;border-radius:50%;pointer-events:none;z-index:6;opacity:0;transition:opacity .8s ease;background:radial-gradient(circle,rgba(232,163,61,0.12) 0%,rgba(232,163,61,0.05) 36%,rgba(232,163,61,0) 70%)}
+#v5-vig{position:fixed;inset:0;z-index:79;pointer-events:none;box-shadow:inset 0 0 240px 70px rgba(0,0,0,0.62)}
+#v5-cmd input{all:unset;flex:1;min-width:60px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#FBF7F1;caret-color:#E8A33D}
+@media (prefers-reduced-motion: reduce){#v5-grain,#v5-spot{display:none}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</helmet>
+<div style="font-family:'IBM Plex Sans',system-ui,sans-serif;background:#0A0807;color:#EFE6DA;position:relative">
+<div id="v5-grain" aria-hidden="true"></div>
+<div id="v5-spot" aria-hidden="true"></div>
+<div id="v5-vig" aria-hidden="true"></div>
+
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:60;pointer-events:none">
+<div style="position:absolute;top:0;left:0;right:0;height:38px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 18px;background:linear-gradient(180deg,rgba(10,8,7,0.94),rgba(10,8,7,0.55));border-bottom:1px solid rgba(239,230,218,0.12);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7E6F63;white-space:nowrap;overflow:hidden">
+<span style="display:flex;align-items:center;gap:9px;flex:none;color:#8FB877"><span style="width:6px;height:6px;border-radius:50%;background:#8FB877;animation:v5-blink 2.4s infinite"></span>Available for assignment</span>
+<span data-hud="chapter" style="color:#E8A33D;overflow:hidden;text-overflow:ellipsis">00 · Arrival</span>
+<span style="display:flex;gap:16px;flex:none"><span data-hud="clock">--:--:--</span><span>NBO · UTC+3</span></span>
+</div>
+<div style="position:absolute;top:38px;bottom:0;left:0;width:56px;border-right:1px solid rgba(239,230,218,0.08);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0">
+<div style="position:relative;width:1px;height:52%;background:rgba(239,230,218,0.14)">
+<div data-hud="ladder" style="position:absolute;left:-3px;top:0;width:7px;height:7px;border-radius:50%;background:#E8A33D;box-shadow:0 0 14px 3px rgba(232,163,61,0.5)"></div>
+</div>
+<div data-hud="pct" style="margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;color:#7E6F63">000</div>
+</div>
+<div style="position:absolute;top:52px;right:14px;width:16px;height:16px;border-top:1px solid rgba(232,163,61,0.4);border-right:1px solid rgba(232,163,61,0.4)"></div>
+<div style="position:absolute;bottom:88px;right:14px;width:16px;height:16px;border-bottom:1px solid rgba(232,163,61,0.4);border-right:1px solid rgba(232,163,61,0.4)"></div>
+<div style="position:absolute;bottom:88px;left:70px;width:16px;height:16px;border-bottom:1px solid rgba(232,163,61,0.4);border-left:1px solid rgba(232,163,61,0.4)"></div>
+</div>
+
+<sc-if value="{{ showConsole }}" hint-placeholder-val="{{ true }}">
+<div id="v5-cmd" style="position:fixed;left:0;right:0;bottom:0;z-index:62;background:linear-gradient(0deg,rgba(10,8,7,0.97),rgba(10,8,7,0.82));border-top:1px solid rgba(239,230,218,0.14)">
+<div style="max-height:150px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:0 18px">
+<sc-for list="{{ lines }}" as="l" hint-placeholder-count="0">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.85;display:flex;gap:9px"><span style="color:#5F534B;flex:none">{{ l.mark }}</span><span style="color:{{ l.color }}">{{ l.text }}</span></div>
+</sc-for>
+</div>
+<form onSubmit="{{ onSubmit }}" style="display:flex;align-items:center;gap:11px;padding:12px 18px 13px;border-top:1px solid rgba(239,230,218,0.07)">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C0603A;flex:none">DECK ›</span>
+<input ref="{{ inputRef }}" placeholder="type help — or press / anywhere" aria-label="Flight deck command line">
+<div style="display:flex;gap:6px;flex:none;flex-wrap:nowrap;overflow:hidden">
+<button onClick="{{ onChip }}" data-cmd="help" style="all:unset;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A7A6D;border:1px solid rgba(239,230,218,0.16);padding:6px 10px;white-space:nowrap" style-hover="color:#E8A33D;border-color:rgba(232,163,61,0.5)">help</button>
+<button onClick="{{ onChip }}" data-cmd="profile" style="all:unset;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A7A6D;border:1px solid rgba(239,230,218,0.16);padding:6px 10px;white-space:nowrap" style-hover="color:#E8A33D;border-color:rgba(232,163,61,0.5)">profile</button>
+<button onClick="{{ onChip }}" data-cmd="hire" style="all:unset;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A7A6D;border:1px solid rgba(239,230,218,0.16);padding:6px 10px;white-space:nowrap" style-hover="color:#E8A33D;border-color:rgba(232,163,61,0.5)">hire</button>
+<button onClick="{{ onSound }}" style="all:unset;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A7A6D;border:1px solid rgba(239,230,218,0.16);padding:6px 10px;white-space:nowrap" style-hover="color:#E8A33D;border-color:rgba(232,163,61,0.5)">snd {{ soundLabel }}</button>
+</div>
+</form>
+</div>
+</sc-if>
+
+<section id="ch0" data-chapter="00 · Arrival" data-screen-label="00" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 120px 76px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:40px;align-items:center;overflow:hidden;border-bottom:1px solid rgba(239,230,218,0.1)">
+<div data-anim="aura" aria-hidden="true" style="position:absolute;top:-24%;left:-8%;width:72%;height:150%;pointer-events:none;background:radial-gradient(45% 45% at 38% 44%,rgba(192,96,58,0.36) 0%,rgba(192,96,58,0) 70%),radial-gradient(38% 38% at 66% 62%,rgba(232,163,61,0.22) 0%,rgba(232,163,61,0) 72%);animation:v5-drift 20s ease-in-out infinite;will-change:transform"></div>
+<div style="position:relative;z-index:1">
+<div data-anim="fade" style="display:flex;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#7E6F63;border:1px solid rgba(239,230,218,0.14);width:max-content;max-width:100%;margin-bottom:34px;white-space:nowrap;overflow:hidden">
+<span style="padding:8px 12px;border-right:1px solid rgba(239,230,218,0.14)">Reg. 5Y—BOO</span>
+<span style="padding:8px 12px;border-right:1px solid rgba(239,230,218,0.14)">Full-stack engineer</span>
+<span style="padding:8px 12px;color:#E8A33D">5 yr + logged</span>
+</div>
+<h1 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(44px,7.6vw,124px);line-height:0.9;letter-spacing:-0.04em;color:#FBF7F1;margin:0 0 28px;text-shadow:0 0 70px rgba(232,163,61,0.14)">Brian Otieno<br><span style="color:#E8A33D;font-style:italic;text-shadow:0 0 36px rgba(232,163,61,0.5),0 0 100px rgba(192,96,58,0.35)">certifies</span> systems<br>for daily service.</h1>
+<p data-anim="fade" style="font-family:Newsreader,Georgia,serif;font-size:19.5px;line-height:1.6;color:#B8AAA0;max-width:600px;margin:0 0 30px;text-wrap:pretty">Civil aviation before software. Aviation taught me that procedure is not bureaucracy — it is the thing standing between a checklist and a headline. I build ERP, school, and geospatial systems the same way: restorable, reversible, auditable.</p>
+<div data-anim="fade" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+<a href="#ch2" data-magnetic="1" style="background:#C0603A;color:#FBF7F1;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 24px;transition:background .3s,box-shadow .4s" style-hover="background:#D4703F;box-shadow:0 14px 46px rgba(192,96,58,0.5)">Walk the deck →</a>
+<a href="mailto:brianokola@gmail.com" data-magnetic="1" style="border:1px solid rgba(239,230,218,0.24);color:#EFE6DA;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;padding:14px 24px;transition:border-color .3s,box-shadow .4s" style-hover="border-color:#E8A33D;color:#E8A33D;box-shadow:0 14px 46px rgba(232,163,61,0.22)">Request contact</a>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:#6E6058">or press <span style="color:#E8A33D">/</span> to fly it by keyboard</span>
+</div>
+</div>
+<div data-anim="hero-photo" style="position:relative;z-index:1;justify-self:start;width:100%;max-width:340px;align-self:stretch;min-height:300px;max-height:min(64vh,520px);border:1px solid rgba(239,230,218,0.12);overflow:hidden">
+<img src="./images/brian-speaking.png" alt="Brian Otieno" style="width:100%;height:108%;object-fit:cover;object-position:52% 14%;display:block;filter:saturate(0.8) contrast(1.06) brightness(0.9)">
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,7,0.5) 0%,rgba(10,8,7,0) 32%,rgba(10,8,7,0.78) 100%)"></div>
+<div aria-hidden="true" style="position:absolute;left:0;right:0;height:20%;pointer-events:none;background:linear-gradient(180deg,rgba(232,163,61,0) 0%,rgba(232,163,61,0.14) 50%,rgba(232,163,61,0) 100%);animation:v5-scan 7.5s linear infinite"></div>
+<div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(10,8,7,0.24) 0px,rgba(10,8,7,0.24) 1px,rgba(10,8,7,0) 1px,rgba(10,8,7,0) 3px);opacity:.55"></div>
+<div aria-hidden="true" style="position:absolute;top:12px;right:12px;width:50px;height:50px;border-radius:50%;border:1px solid rgba(232,163,61,0.32);overflow:hidden">
+<div style="position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(232,163,61,0.55) 0deg,rgba(232,163,61,0) 90deg);animation:v5-sweep 3.6s linear infinite"></div>
+<div style="position:absolute;inset:44%;border-radius:50%;background:#E8A33D;animation:v5-blink 2.4s infinite"></div>
+</div>
+<div style="position:absolute;left:12px;bottom:12px;right:12px;display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.1em;color:rgba(239,230,218,0.66)"><span>PHOTO / OTIENO_B</span><span>NBO</span></div>
+</div>
+</section>
+
+<sc-if value="{{ showProfile }}" hint-placeholder-val="{{ true }}">
+<section id="ch1" data-chapter="01 · Flight profile" data-screen-label="01" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 120px 76px;display:flex;flex-direction:column;justify-content:center;gap:34px;border-bottom:1px solid rgba(239,230,218,0.1);background:#0D0A09">
+<div data-anim="fade" style="display:flex;justify-content:space-between;align-items:baseline;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#7E6F63;border-bottom:1px solid rgba(239,230,218,0.12);padding-bottom:12px;flex-wrap:wrap;gap:10px"><span style="color:#E8A33D;white-space:nowrap">Flight profile · 2018 — 2026</span><span style="white-space:nowrap">6 legs logged</span></div>
+<h2 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(30px,4.4vw,64px);line-height:1.04;letter-spacing:-0.03em;color:#FBF7F1;margin:0;max-width:900px;text-wrap:pretty">Aviation, then fintech, then GIS, then ERP. The altitude only went one way.</h2>
+<div style="display:flex;flex-direction:column;gap:0;border-top:1px solid rgba(239,230,218,0.1)">
+<div style="display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:18px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:#5F534B;padding:11px 0"><span>Operator</span><span style="display:grid;grid-template-columns:repeat(9,1fr)"><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span></span><span style="text-align:right">Sector</span></div>
+<div data-anim="leg" style="display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:18px;align-items:center;padding:13px 0;border-top:1px solid rgba(239,230,218,0.07);transition:background .35s" style-hover="background:rgba(232,163,61,0.05)"><div style="font-size:13.5px;color:#FBF7F1">Lloyd Constellations<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A7A6D;margin-top:2px">Software Engineer<span style="display:block;color:#6E6058;margin-top:2px">ODOO 18 · 6 MODULES · 5 SERVERS</span></div></div><div style="position:relative;height:26px;display:grid;grid-template-columns:repeat(9,1fr)"><div data-bar="1" style="grid-column:8 / span 2;background:linear-gradient(90deg,#C0603A,#E8A33D);height:26px;white-space:nowrap;overflow:hidden;transform-origin:0 50%"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6E6058;text-align:right">ERP</div></div>
+<div data-anim="leg" style="display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:18px;align-items:center;padding:13px 0;border-top:1px solid rgba(239,230,218,0.07);transition:background .35s" style-hover="background:rgba(232,163,61,0.05)"><div style="font-size:13.5px;color:#FBF7F1">Integrated Spatial<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A7A6D;margin-top:2px">GIS Developer &amp; Data Eng.<span style="display:block;color:#6E6058;margin-top:2px">POSTGIS · 60+ MAPS · 4 APPS</span></div></div><div style="position:relative;height:26px;display:grid;grid-template-columns:repeat(9,1fr)"><div data-bar="1" style="grid-column:6 / span 2;background:linear-gradient(90deg,#3F6F5A,#8FB877);height:26px;white-space:nowrap;overflow:hidden;transform-origin:0 50%"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6E6058;text-align:right">GIS</div></div>
+<div data-anim="leg" style="display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:18px;align-items:center;padding:13px 0;border-top:1px solid rgba(239,230,218,0.07);transition:background .35s" style-hover="background:rgba(232,163,61,0.05)"><div style="font-size:13.5px;color:#FBF7F1">Bakpage Labs<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A7A6D;margin-top:2px">Full-Stack Developer<span style="display:block;color:#6E6058;margin-top:2px">DJANGO + REACT · M-PESA</span></div></div><div style="position:relative;height:26px;display:grid;grid-template-columns:repeat(9,1fr)"><div data-bar="1" style="grid-column:4 / span 2;background:linear-gradient(90deg,#4A5C7A,#8A9FB8);height:26px;white-space:nowrap;overflow:hidden;transform-origin:0 50%"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6E6058;text-align:right">Product</div></div>
+<div data-anim="leg" style="display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:18px;align-items:center;padding:13px 0;border-top:1px solid rgba(239,230,218,0.07);transition:background .35s" style-hover="background:rgba(232,163,61,0.05)"><div style="font-size:13.5px;color:#FBF7F1">Eclectics International<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A7A6D;margin-top:2px">Frontend Engineer Intern<span style="display:block;color:#6E6058;margin-top:2px">244+ INSTITUTIONS</span></div></div><div style="position:relative;height:26px;display:grid;grid-template-columns:repeat(9,1fr)"><div data-bar="1" style="grid-column:3 / span 1;background:linear-gradient(90deg,#5B4A6E,#9A86B5);height:26px;white-space:nowrap;overflow:hidden;transform-origin:0 50%"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6E6058;text-align:right">Fintech</div></div>
+<div data-anim="leg" style="display:grid;grid-template-columns:190px minmax(0,1fr) 96px;gap:18px;align-items:center;padding:13px 0;border-top:1px solid rgba(239,230,218,0.07);transition:background .35s" style-hover="background:rgba(232,163,61,0.05)"><div style="font-size:13.5px;color:#FBF7F1">Kenya Civil Aviation<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A7A6D;margin-top:2px">Flight Operations Intern<span style="display:block;color:#6E6058;margin-top:2px">AOC FILES · MANUAL REVIEW</span></div></div><div style="position:relative;height:26px;display:grid;grid-template-columns:repeat(9,1fr)"><div data-bar="1" style="grid-column:1 / span 2;background:linear-gradient(90deg,#6E6058,#B8AAA0);height:26px;white-space:nowrap;overflow:hidden;transform-origin:0 50%"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6E6058;text-align:right">Aviation</div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:rgba(239,230,218,0.1)">
+<div data-anim="stat" style="background:#0D0A09;padding:20px 20px 20px 0"><div style="font-family:Newsreader,Georgia,serif;font-size:clamp(34px,3.8vw,52px);line-height:1;color:#E8A33D"><span data-count="8">8</span></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.7;color:#8A7A6D;margin-top:7px">ERP DEPLOYMENTS<br>FLOWN END-TO-END</div></div>
+<div data-anim="stat" style="background:#0D0A09;padding:20px"><div style="font-family:Newsreader,Georgia,serif;font-size:clamp(34px,3.8vw,52px);line-height:1;color:#E8A33D"><span data-count="99.5" data-count-decimals="1">99.5</span>%</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.7;color:#8A7A6D;margin-top:7px">UPTIME · 5 PRODUCTION<br>SERVERS · 8 MONTHS</div></div>
+<div data-anim="stat" style="background:#0D0A09;padding:20px"><div style="font-family:Newsreader,Georgia,serif;font-size:clamp(34px,3.8vw,52px);line-height:1;color:#E8A33D"><span data-count="244">244</span>+</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.7;color:#8A7A6D;margin-top:7px">INSTITUTIONS REACHED<br>BY SHIPPED UI</div></div>
+<div data-anim="stat" style="background:#0D0A09;padding:20px"><div style="font-family:Newsreader,Georgia,serif;font-size:clamp(34px,3.8vw,52px);line-height:1;color:#E8A33D"><span data-count="90">90</span>%</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.7;color:#8A7A6D;margin-top:7px">TICKETS CLOSED INSIDE<br>A 24-HOUR SLA</div></div>
+</div>
+</section>
+</sc-if>
+
+<section id="ch2" data-chapter="02 · CBC School Management" data-screen-label="02" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 120px 76px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:48px;align-items:center;border-bottom:1px solid rgba(239,230,218,0.1)">
+<div>
+<div data-anim="fade" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:#C0603A;margin-bottom:20px">Leg 02 · education sector · in service</div>
+<h3 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(32px,4.6vw,72px);line-height:1;letter-spacing:-0.03em;color:#FBF7F1;margin:0 0 20px">CBC School Management</h3>
+<p data-anim="fade" style="font-size:16.5px;line-height:1.65;color:#B8AAA0;margin:0 0 26px;max-width:520px;text-wrap:pretty">Kenya moved to a competency-based curriculum and school software didn't follow. I built the platform around the new model instead of retrofitting grades onto it.</p>
+<div style="display:flex;flex-direction:column;gap:11px">
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Formative competency assessment modelled directly — no percentage gradebook in a costume.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Enrollment, timetabling and fees on one Django REST API with a React front end.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Tuned for the low-end Android devices school staff actually carry.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#E8A33D;font-family:'IBM Plex Mono',monospace;font-size:13px">→</span><p style="font-size:14.5px;line-height:1.55;color:#FBF7F1;margin:0;font-weight:500">In active daily use across multiple Kenyan institutions.</p></div>
+</div>
+</div>
+<div style="max-width:100%;overflow-x:auto;overflow-y:hidden;padding:6px 0">
+<div data-anim="screen" style="min-width:620px;border:1px solid rgba(239,230,218,0.14);background:#F7F3EC;box-shadow:0 40px 90px rgba(0,0,0,0.55);overflow:hidden">
+<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:#E9E1D4;border-bottom:1px solid #D6CBBA">
+<span style="width:8px;height:8px;border-radius:50%;background:#C0603A"></span><span style="width:8px;height:8px;border-radius:50%;background:#E8A33D"></span><span style="width:8px;height:8px;border-radius:50%;background:#8FB877"></span>
+<span style="margin-left:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A7A6D;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">cbc.school / grade 5 · term 2 · competency sheet</span>
+</div>
+<div style="display:grid;grid-template-columns:132px minmax(0,1fr);min-height:330px">
+<div style="background:#F0EAE0;border-right:1px solid #DFD5C6;padding:14px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B6259;display:flex;flex-direction:column;gap:9px">
+<div style="color:#A0725C;letter-spacing:0.12em">MENU</div>
+<div style="background:#C0603A;color:#FBF7F1;padding:6px 8px">Assessment</div>
+<div style="padding:6px 8px">Learners</div><div style="padding:6px 8px">Timetable</div><div style="padding:6px 8px">Fees</div><div style="padding:6px 8px">Reports</div>
+<div style="margin-top:auto;color:#8FB877">● synced 2m ago</div>
+</div>
+<div style="padding:16px 18px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px"><div style="font-family:Newsreader,Georgia,serif;font-size:22px;color:#241E19;white-space:nowrap">Mathematics · Number</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A7A6D;white-space:nowrap">32 LEARNERS</div></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 62px 74px;gap:0;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.1em;color:#A0725C;border-bottom:1px solid #DFD5C6;padding-bottom:7px"><span>LEARNER</span><span>ADD/SUB</span><span>FRACT</span><span>MEASURE</span><span style="text-align:right">LEVEL</span></div>
+<div data-row="1" style="display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 62px 74px;align-items:center;padding:9px 0;border-bottom:1px solid #EDE6DA;font-size:12.5px;color:#4E453D"><span>Achieng, W.</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3F6F5A">EE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3F6F5A">EE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="text-align:right"><span style="background:#DCEAD2;color:#3F6F5A;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px">EXCEEDING</span></span></div>
+<div data-row="1" style="display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 62px 74px;align-items:center;padding:9px 0;border-bottom:1px solid #EDE6DA;font-size:12.5px;color:#4E453D"><span>Barasa, K.</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="text-align:right"><span style="background:#F3E4D2;color:#A0725C;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px">MEETING</span></span></div>
+<div data-row="1" style="display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 62px 74px;align-items:center;padding:9px 0;border-bottom:1px solid #EDE6DA;font-size:12.5px;color:#4E453D"><span>Chebet, N.</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C0603A">AE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="text-align:right"><span style="background:#F3E4D2;color:#A0725C;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px">MEETING</span></span></div>
+<div data-row="1" style="display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 62px 74px;align-items:center;padding:9px 0;border-bottom:1px solid #EDE6DA;font-size:12.5px;color:#4E453D"><span>Kimani, J.</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C0603A">AE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C0603A">AE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="text-align:right"><span style="background:#F6DED2;color:#C0603A;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px">APPROACHING</span></span></div>
+<div data-row="1" style="display:grid;grid-template-columns:minmax(0,1fr) 62px 62px 62px 74px;align-items:center;padding:9px 0;font-size:12.5px;color:#4E453D"><span>Omondi, T.</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3F6F5A">EE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A0725C">ME</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3F6F5A">EE</span><span style="text-align:right"><span style="background:#DCEAD2;color:#3F6F5A;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px">EXCEEDING</span></span></div>
+<div style="margin-top:14px;display:flex;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A7A6D"><span style="border:1px solid #DFD5C6;padding:5px 9px;white-space:nowrap">SAVE DRAFT</span><span style="background:#241E19;color:#FBF7F1;padding:5px 9px;white-space:nowrap">SUBMIT TO HEAD</span><span style="padding:5px 0;white-space:nowrap">Audit: 4 changes stamped</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="ch3" data-chapter="03 · WaterWatch" data-screen-label="03" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 120px 76px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:48px;align-items:center;border-bottom:1px solid rgba(239,230,218,0.1);background:#0D0A09">
+<div style="max-width:100%;overflow-x:auto;overflow-y:hidden;padding:6px 0">
+<div data-anim="screen" style="min-width:660px;border:1px solid rgba(239,230,218,0.14);background:#0F1512;box-shadow:0 40px 90px rgba(0,0,0,0.6);overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#141C18;border-bottom:1px solid rgba(143,184,119,0.2);font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8FB877;white-space:nowrap"><span style="overflow:hidden;text-overflow:ellipsis">WATERWATCH · TRIAGE QUEUE · SDG 6.1</span><span>14 OPEN · 3 BREACHING</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 210px;min-height:340px">
+<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+<div data-row="1" style="border:1px solid rgba(143,184,119,0.22);padding:11px 12px;display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:12px;align-items:center"><div><div style="font-size:13px;color:#EFE6DA">Borehole 14 · Kibera South</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E8A78;margin-top:3px">CONTAMINATION · reported 09:14 · 22 households</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0E1710;background:#C0603A;padding:4px 7px;text-align:center">BREACHING</div></div>
+<div data-row="1" style="border:1px solid rgba(143,184,119,0.16);padding:11px 12px;display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:12px;align-items:center"><div><div style="font-size:13px;color:#EFE6DA">Standpipe 07 · Ruiru</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E8A78;margin-top:3px">NO FLOW · claimed by tech_04 · 41m ago</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0E1710;background:#E8A33D;padding:4px 7px;text-align:center">CLAIMED</div></div>
+<div data-row="1" style="border:1px solid rgba(143,184,119,0.16);padding:11px 12px;display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:12px;align-items:center"><div><div style="font-size:13px;color:#EFE6DA">Kiosk 22 · Athi River</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E8A78;margin-top:3px">PUMP FAULT · unassigned · 2h 06m</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#EFE6DA;border:1px solid rgba(239,230,218,0.3);padding:4px 7px;text-align:center">TRIAGE</div></div>
+<div data-row="1" style="border:1px solid rgba(143,184,119,0.16);padding:11px 12px;display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:12px;align-items:center"><div><div style="font-size:13px;color:#EFE6DA">Borehole 03 · Kajiado</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E8A78;margin-top:3px">RESOLVED by tech_01 · signed off 08:52</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0E1710;background:#8FB877;padding:4px 7px;text-align:center">CLOSED</div></div>
+<div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F6B5C;border-top:1px solid rgba(143,184,119,0.14);padding-top:9px">AUDIT · every transition carries actor + timestamp</div>
+</div>
+<div style="border-left:1px solid rgba(143,184,119,0.18);background:#0B100D;padding:12px;position:relative">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.14em;color:#5F6B5C;margin-bottom:10px">POINT MAP</div>
+<div style="position:relative;height:210px;border:1px solid rgba(143,184,119,0.16);background:repeating-linear-gradient(0deg,rgba(143,184,119,0.07) 0px,rgba(143,184,119,0.07) 1px,transparent 1px,transparent 26px),repeating-linear-gradient(90deg,rgba(143,184,119,0.07) 0px,rgba(143,184,119,0.07) 1px,transparent 1px,transparent 26px)">
+<div style="position:absolute;left:22%;top:30%;width:9px;height:9px;border-radius:50%;background:#C0603A;box-shadow:0 0 12px 3px rgba(192,96,58,0.6);animation:v5-blink 1.8s infinite"></div>
+<div style="position:absolute;left:58%;top:20%;width:7px;height:7px;border-radius:50%;background:#E8A33D"></div>
+<div style="position:absolute;left:70%;top:62%;width:7px;height:7px;border-radius:50%;background:#EFE6DA"></div>
+<div style="position:absolute;left:34%;top:74%;width:7px;height:7px;border-radius:50%;background:#8FB877"></div>
+<div style="position:absolute;left:46%;top:48%;width:7px;height:7px;border-radius:50%;background:#8FB877"></div>
+</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:2;color:#7E8A78;margin-top:12px">MTTR · 11h 24m<br>SLA HIT · 90%<br>OWNERLESS · 0</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div data-anim="fade" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:#8FB877;margin-bottom:20px">Leg 03 · public infrastructure · in service</div>
+<h3 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(32px,4.6vw,72px);line-height:1;letter-spacing:-0.03em;color:#FBF7F1;margin:0 0 20px">WaterWatch</h3>
+<p data-anim="fade" style="font-size:16.5px;line-height:1.65;color:#B8AAA0;margin:0 0 26px;max-width:500px;text-wrap:pretty">Fault reporting for community water points, built against UN SDG 6.1. The hard part was never the report — it was accountability after it.</p>
+<div style="display:flex;flex-direction:column;gap:11px">
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Reporting usable by non-technical residents on any handset.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Triage → claim → resolve, so no fault sits in nobody's queue.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Every status change stamped with actor and timestamp — the aviation habit, applied to water.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#E8A33D;font-family:'IBM Plex Mono',monospace;font-size:13px">→</span><p style="font-size:14.5px;line-height:1.55;color:#FBF7F1;margin:0;font-weight:500">Nothing closes without a named owner and a full trail.</p></div>
+</div>
+</div>
+</section>
+
+<section id="ch4" data-chapter="04 · Smart Ticketing" data-screen-label="04" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 120px 76px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:48px;align-items:center;border-bottom:1px solid rgba(239,230,218,0.1)">
+<div>
+<div data-anim="fade" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:#8A9FB8;margin-bottom:20px">Leg 04 · field operations · in service</div>
+<h3 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(32px,4.6vw,72px);line-height:1;letter-spacing:-0.03em;color:#FBF7F1;margin:0 0 20px">Smart Ticketing</h3>
+<p data-anim="fade" style="font-size:16.5px;line-height:1.65;color:#B8AAA0;margin:0 0 26px;max-width:500px;text-wrap:pretty">Support work lives on phones, not desks. Tickets assigned, watched against SLA, and closed from wherever the agent is standing.</p>
+<div style="display:flex;flex-direction:column;gap:11px">
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">One Flutter client covering iOS and Android instead of two divergent codebases.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">Node/Express service owning lifecycle, assignment and notifications.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><p style="font-size:14.5px;line-height:1.55;color:#9C8C7E;margin:0">SLA pressure visible in the UI before a breach, not after.</p></div>
+<div data-anim="check" style="display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start"><span style="color:#E8A33D;font-family:'IBM Plex Mono',monospace;font-size:13px">→</span><p style="font-size:14.5px;line-height:1.55;color:#FBF7F1;margin:0;font-weight:500">Real-time status across both platforms from one build.</p></div>
+</div>
+</div>
+<div style="max-width:100%;overflow-x:auto;overflow-y:hidden;padding:6px 0">
+<div data-anim="screen" style="min-width:560px;display:grid;grid-template-columns:248px minmax(0,1fr);gap:20px;align-items:center">
+<div style="border:1px solid rgba(239,230,218,0.16);border-radius:26px;background:#12100E;padding:10px;box-shadow:0 40px 90px rgba(0,0,0,0.6)">
+<div style="border-radius:18px;overflow:hidden;background:#1A1613">
+<div style="display:flex;justify-content:space-between;padding:9px 14px 7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A7A6D"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+<div style="padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px">
+<div style="font-family:Newsreader,Georgia,serif;font-size:19px;color:#FBF7F1;margin-bottom:2px">My queue · 6</div>
+<div data-row="1" style="border:1px solid rgba(232,163,61,0.3);padding:9px 10px"><div style="font-size:12.5px;color:#FBF7F1">#4821 · POS offline</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A7A6D;margin-top:4px">Nakuru branch · P1</div><div style="height:3px;background:rgba(239,230,218,0.12);margin-top:8px"><div style="width:82%;height:3px;background:#C0603A"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#C0603A;margin-top:5px">SLA 82% · 34m LEFT</div></div>
+<div data-row="1" style="border:1px solid rgba(239,230,218,0.12);padding:9px 10px"><div style="font-size:12.5px;color:#FBF7F1">#4817 · Receipt printer</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A7A6D;margin-top:4px">Thika road · P2</div><div style="height:3px;background:rgba(239,230,218,0.12);margin-top:8px"><div style="width:44%;height:3px;background:#E8A33D"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#E8A33D;margin-top:5px">SLA 44% · 3h 12m</div></div>
+<div data-row="1" style="border:1px solid rgba(239,230,218,0.12);padding:9px 10px"><div style="font-size:12.5px;color:#FBF7F1">#4809 · M-Pesa mismatch</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A7A6D;margin-top:4px">Westlands · P3</div><div style="height:3px;background:rgba(239,230,218,0.12);margin-top:8px"><div style="width:18%;height:3px;background:#8FB877"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#8FB877;margin-top:5px">SLA 18% · 9h 40m</div></div>
+<div style="display:flex;gap:7px;margin-top:2px"><span style="flex:1;text-align:center;background:#C0603A;color:#FBF7F1;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:8px 0">CLAIM</span><span style="flex:1;text-align:center;border:1px solid rgba(239,230,218,0.2);color:#EFE6DA;font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:8px 0">ESCALATE</span></div>
+</div>
+</div>
+</div>
+<div style="border:1px solid rgba(239,230,218,0.12);background:#0E0C0A;padding:16px 18px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.16em;color:#6E6058;margin-bottom:12px">DISPATCH · SLA PRESSURE, LAST 12H</div>
+<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:5px;align-items:end;height:150px">
+<div data-bar-v="1" style="height:38%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:52%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:44%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:68%;background:#E8A33D;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:82%;background:#E8A33D;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:96%;background:#C0603A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:74%;background:#E8A33D;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:58%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:46%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:34%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:28%;background:#3F6F5A;transform-origin:50% 100%"></div><div data-bar-v="1" style="height:40%;background:#3F6F5A;transform-origin:50% 100%"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#5F534B;margin-top:9px"><span>21:00</span><span>03:00</span><span>09:00</span></div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.9;color:#8A7A6D;margin-top:14px;border-top:1px solid rgba(239,230,218,0.1);padding-top:11px">PEAK 06:00 · 96% OF SLA<br>ESCALATED BEFORE BREACH · 1<br>BREACHES · 0</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="ch5" data-chapter="05 · Checklist &amp; incident" data-screen-label="05" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 120px 76px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:52px;align-items:center;border-bottom:1px solid rgba(239,230,218,0.1);background:#0D0A09">
+<div>
+<div data-anim="fade" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:#E8A33D;margin-bottom:20px">Leg 05 · standard procedure</div>
+<h3 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(30px,4vw,60px);line-height:1.04;letter-spacing:-0.03em;color:#FBF7F1;margin:0 0 20px;text-wrap:pretty">Aviation gave me a checklist habit. I never shipped it away.</h3>
+<p data-anim="fade" style="font-size:16px;line-height:1.68;color:#9C8C7E;margin:0 0 32px;max-width:460px;text-wrap:pretty">At the Kenya Civil Aviation Authority I prepared Air Operator Certificates and reviewed operations manuals — documents whose whole purpose is that nothing important depends on memory. Six things I run before anything of mine touches production.</p>
+
+<div data-anim="report" style="border:1px solid rgba(232,163,61,0.3);background:rgba(232,163,61,0.04);max-width:460px">
+<div style="display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(232,163,61,0.25);font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:#E8A33D;white-space:nowrap"><span>Occurrence report</span><span style="color:#7E6F63">FORM 05—A</span></div>
+<div style="padding:15px 16px;display:flex;flex-direction:column;gap:13px">
+<div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.14em;color:#7E6F63;margin-bottom:5px">1 · WHAT HAPPENED</div><div data-field="1" style="font-size:14px;line-height:1.55;color:#8A7A6D;border-bottom:1px dashed rgba(239,230,218,0.18);padding-bottom:9px;font-style:italic">Awaiting your account — the one production failure worth telling.</div></div>
+<div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.14em;color:#7E6F63;margin-bottom:5px">2 · HOW IT WAS DETECTED</div><div data-field="1" style="font-size:14px;line-height:1.55;color:#8A7A6D;border-bottom:1px dashed rgba(239,230,218,0.18);padding-bottom:9px;font-style:italic">Alert, or a user telling you first? Both are honest answers.</div></div>
+<div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.14em;color:#7E6F63;margin-bottom:5px">3 · IMMEDIATE ACTION</div><div data-field="1" style="font-size:14px;line-height:1.55;color:#8A7A6D;border-bottom:1px dashed rgba(239,230,218,0.18);padding-bottom:9px;font-style:italic">What you did in the first hour.</div></div>
+<div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.14em;color:#7E6F63;margin-bottom:5px">4 · WHAT CHANGED AFTER</div><div data-field="1" style="font-size:14px;line-height:1.55;color:#8A7A6D;padding-bottom:2px;font-style:italic">The line that turned into a checklist item above.</div></div>
+</div>
+<div style="padding:10px 16px;border-top:1px solid rgba(232,163,61,0.2);font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#9C8C7E;text-wrap:pretty">Send me the four answers and I'll set this in type — no failure invented on your behalf.</div>
+</div>
+</div>
+<div style="border-top:1px solid rgba(239,230,218,0.12)">
+<div data-anim="check" style="display:grid;grid-template-columns:24px 1fr 88px;gap:14px;padding:16px 0;border-bottom:1px solid rgba(239,230,218,0.08);align-items:baseline"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><div><div style="font-size:16px;font-weight:600;color:#FBF7F1">Backups restored, not just taken</div><div style="font-size:14px;color:#8A7A6D;margin-top:3px">Nightly PostgreSQL dumps mean nothing until you've rebuilt from one.</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F534B;text-align:right">CHECKED</span></div>
+<div data-anim="check" style="display:grid;grid-template-columns:24px 1fr 88px;gap:14px;padding:16px 0;border-bottom:1px solid rgba(239,230,218,0.08);align-items:baseline"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><div><div style="font-size:16px;font-weight:600;color:#FBF7F1">Migrations reversible</div><div style="font-size:14px;color:#8A7A6D;margin-top:3px">Eight concurrent client schemas taught me to write the way back first.</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F534B;text-align:right">CHECKED</span></div>
+<div data-anim="check" style="display:grid;grid-template-columns:24px 1fr 88px;gap:14px;padding:16px 0;border-bottom:1px solid rgba(239,230,218,0.08);align-items:baseline"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><div><div style="font-size:16px;font-weight:600;color:#FBF7F1">Audit trail on anything that matters</div><div style="font-size:14px;color:#8A7A6D;margin-top:3px">Actor and timestamp on every state change — money, grades, faults.</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F534B;text-align:right">CHECKED</span></div>
+<div data-anim="check" style="display:grid;grid-template-columns:24px 1fr 88px;gap:14px;padding:16px 0;border-bottom:1px solid rgba(239,230,218,0.08);align-items:baseline"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><div><div style="font-size:16px;font-weight:600;color:#FBF7F1">Monitoring before incidents, not after</div><div style="font-size:14px;color:#8A7A6D;margin-top:3px">Proactive patching and alerting is how five servers held 99.5%.</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F534B;text-align:right">CHECKED</span></div>
+<div data-anim="check" style="display:grid;grid-template-columns:24px 1fr 88px;gap:14px;padding:16px 0;border-bottom:1px solid rgba(239,230,218,0.08);align-items:baseline"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><div><div style="font-size:16px;font-weight:600;color:#FBF7F1">Tested on the worst device in the room</div><div style="font-size:14px;color:#8A7A6D;margin-top:3px">If it isn't usable on a low-end Android, it isn't shipped.</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F534B;text-align:right">CHECKED</span></div>
+<div data-anim="check" style="display:grid;grid-template-columns:24px 1fr 88px;gap:14px;padding:16px 0;align-items:baseline"><span style="color:#8FB877;font-family:'IBM Plex Mono',monospace;font-size:13px">✓</span><div><div style="font-size:16px;font-weight:600;color:#FBF7F1">Handover documented</div><div style="font-size:14px;color:#8A7A6D;margin-top:3px">Architecture and deployment written down so the bus factor stays above one.</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5F534B;text-align:right">CHECKED</span></div>
+</div>
+</section>
+
+<section id="ch6" data-chapter="06 · Clearance" data-screen-label="06" style="position:relative;min-height:100vh;box-sizing:border-box;padding:78px 40px 130px 76px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:52px;align-items:center;overflow:hidden">
+<div data-anim="aura" aria-hidden="true" style="position:absolute;right:-14%;bottom:-44%;width:64%;height:150%;pointer-events:none;background:radial-gradient(42% 42% at 50% 50%,rgba(232,163,61,0.22) 0%,rgba(232,163,61,0) 70%),radial-gradient(36% 36% at 34% 62%,rgba(192,96,58,0.20) 0%,rgba(192,96,58,0) 72%);animation:v5-drift 24s ease-in-out infinite;will-change:transform"></div>
+<div style="position:relative;z-index:1">
+<div data-anim="fade" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7E6F63;margin-bottom:22px">Leg 06 · clearance to contact</div>
+<h3 data-split="1" style="font-family:Newsreader,Georgia,serif;font-weight:200;font-size:clamp(32px,5vw,78px);line-height:1;letter-spacing:-0.035em;color:#FBF7F1;margin:0 0 22px;text-wrap:pretty">Cleared for departure.</h3>
+<p data-anim="fade" style="font-size:16.5px;line-height:1.7;color:#9C8C7E;margin:0 0 22px;max-width:520px;text-wrap:pretty">Hiring for a senior full-stack or platform role? Remote-friendly, Nairobi-based, comfortable owning the whole path from schema to server. Happy to walk through any leg above in detail.</p>
+<div data-anim="fade" style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.9;color:#6E6058">MSc Computing &amp; Information Systems — Strathmore <span style="color:#E8A33D">(in progress)</span><br>Data Science &amp; ML — MIT · Software Development — Moringa · BSc Civil Aviation — Moi<br>AWS Cloud Practitioner · Cisco Junior Cyber Security Analyst <span style="color:#E8A33D">(in progress)</span></div>
+</div>
+<div data-anim="fade" style="position:relative;z-index:1;border:1px solid rgba(239,230,218,0.16)">
+<a href="mailto:brianokola@gmail.com" style="display:flex;justify-content:space-between;gap:16px;padding:17px 20px;border-bottom:1px solid rgba(239,230,218,0.1);font-family:'IBM Plex Mono',monospace;font-size:13px;color:#EFE6DA" style-hover="background:rgba(232,163,61,0.08);color:#E8A33D"><span style="color:#6E6058">EMAIL</span>brianokola@gmail.com</a>
+<a href="https://github.com/default-007" style="display:flex;justify-content:space-between;gap:16px;padding:17px 20px;border-bottom:1px solid rgba(239,230,218,0.1);font-family:'IBM Plex Mono',monospace;font-size:13px;color:#EFE6DA" style-hover="background:rgba(232,163,61,0.08);color:#E8A33D"><span style="color:#6E6058">GITHUB</span>default-007</a>
+<a href="https://linkedin.com/in/brian-otieno" style="display:flex;justify-content:space-between;gap:16px;padding:17px 20px;border-bottom:1px solid rgba(239,230,218,0.1);font-family:'IBM Plex Mono',monospace;font-size:13px;color:#EFE6DA" style-hover="background:rgba(232,163,61,0.08);color:#E8A33D"><span style="color:#6E6058">LINKEDIN</span>brian-otieno</a>
+<a href="tel:+254708681091" style="display:flex;justify-content:space-between;gap:16px;padding:17px 20px;border-bottom:1px solid rgba(239,230,218,0.1);font-family:'IBM Plex Mono',monospace;font-size:13px;color:#EFE6DA" style-hover="background:rgba(232,163,61,0.08);color:#E8A33D"><span style="color:#6E6058">PHONE</span>+254 708 681091</a>
+<a href="./Brian%20Otieno%20Resume.dc.html" style="display:flex;justify-content:space-between;gap:16px;padding:17px 20px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E8A33D" style-hover="background:rgba(232,163,61,0.08)"><span style="color:#6E6058">DOCUMENT</span>Résumé →</a>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;showConsole&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Flight deck&quot;},&quot;showProfile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Flight deck&quot;}}">
+class Component extends DCLogic {
+  state = { lines: [], sound: false, chapter: '00 · Arrival' };
+
+  componentDidMount() {
+    this._linkCleanup = [];
+    this._chapters = ['ch0', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'ch6'];
+    this.startClock();
+    this.bindKeys();
+    this.waitForGsap();
+  }
+  componentWillUnmount() { this._dead = true; this.kill(); }
+  componentDidUpdate(prev) {
+    if (prev.showProfile !== this.props.showProfile || prev.showConsole !== this.props.showConsole) {
+      this.kill(); this.startClock(); this.bindKeys(); this.waitForGsap();
+    }
+  }
+
+  /* ---------- console ---------- */
+  say(text, color) {
+    this.setState(s => ({ lines: s.lines.concat([{ mark: '·', text: text, color: color || '#B8AAA0' }]).slice(-6) }));
+  }
+  echo(text) {
+    this.setState(s => ({ lines: s.lines.concat([{ mark: '›', text: text, color: '#FBF7F1' }]).slice(-6) }));
+  }
+  blip(freq) {
+    if (!this.state.sound) return;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      this._ac = this._ac || new Ctx();
+      const o = this._ac.createOscillator(), g = this._ac.createGain();
+      o.type = 'triangle'; o.frequency.value = freq || 660;
+      g.gain.setValueAtTime(0.05, this._ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, this._ac.currentTime + 0.13);
+      o.connect(g).connect(this._ac.destination); o.start(); o.stop(this._ac.currentTime + 0.14);
+    } catch (e) { /* audio blocked */ }
+  }
+  jump(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const sc = this._scroller || window;
+    const top = sc === window
+      ? el.getBoundingClientRect().top + (window.pageYOffset || 0)
+      : el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop;
+    if (sc === window) window.scrollTo({ top: top, behavior: 'smooth' });
+    else sc.scrollTo({ top: top, behavior: 'smooth' });
+  }
+  run(raw) {
+    const cmd = (raw || '').trim().toLowerCase();
+    if (!cmd) return;
+    this.echo(cmd);
+    this.blip(720);
+    const go = (id, label) => { this.jump(id); this.say('routing to ' + label, '#8FB877'); };
+    if (cmd === 'help' || cmd === '?') return this.say('ls · profile · open 02|03|04 · checklist · incident · hire · resume · sound · clear', '#E8A33D');
+    if (cmd === 'ls') return this.say('00 arrival / 01 profile / 02 cbc / 03 waterwatch / 04 ticketing / 05 checklist+incident / 06 clearance', '#B8AAA0');
+    if (cmd === 'whoami') return this.say('brian otieno — full-stack engineer, nairobi. 5 yr logged. aviation before software.', '#B8AAA0');
+    if (cmd === 'profile' || cmd === 'open 01') return go('ch1', 'flight profile');
+    if (cmd === 'open 02' || cmd === 'cbc' || cmd === 'open cbc') return go('ch2', 'cbc school management');
+    if (cmd === 'open 03' || cmd === 'water' || cmd === 'waterwatch') return go('ch3', 'waterwatch');
+    if (cmd === 'open 04' || cmd === 'ticketing' || cmd === 'tickets') return go('ch4', 'smart ticketing');
+    if (cmd === 'checklist' || cmd === 'open 05' || cmd === 'incident') return go('ch5', 'checklist & incident');
+    if (cmd === 'hire' || cmd === 'contact' || cmd === 'open 06') return go('ch6', 'clearance');
+    if (cmd === 'top' || cmd === 'open 00') return go('ch0', 'arrival');
+    if (cmd === 'stats') return this.say('8 erp deployments · 99.5% uptime · 244+ institutions · 90% inside 24h sla', '#B8AAA0');
+    if (cmd === 'resume') { window.open('./Brian%20Otieno%20Resume.dc.html', '_blank'); return this.say('opening résumé', '#8FB877'); }
+    if (cmd === 'sound') return this.toggleSound();
+    if (cmd === 'clear') return this.setState({ lines: [] });
+    this.say('unknown command: ' + cmd + ' — try help', '#C0603A');
+  }
+  toggleSound() {
+    this.setState(s => ({ sound: !s.sound }), () => this.say('sound ' + (this.state.sound ? 'on' : 'off'), '#E8A33D'));
+  }
+
+  startClock() {
+    const tick = () => {
+      const el = document.querySelector('[data-hud="clock"]');
+      if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      this._clock = setTimeout(tick, 1000);
+    };
+    tick();
+  }
+
+  bindKeys() {
+    this._keys = (e) => {
+      const t = e.target;
+      const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+      if (e.key === '/' && !typing) { e.preventDefault(); if (this._input) this._input.focus(); return; }
+      if (typing) return;
+      if (e.key === 'j' || e.key === 'k') {
+        const cur = this._chapters.indexOf(this._active || 'ch0');
+        const next = Math.min(this._chapters.length - 1, Math.max(0, cur + (e.key === 'j' ? 1 : -1)));
+        this.jump(this._chapters[next]);
+        this.blip(e.key === 'j' ? 560 : 700);
+      }
+    };
+    window.addEventListener('keydown', this._keys);
+  }
+
+  /* ---------- motion ---------- */
+  waitForGsap(tries = 0) {
+    if (window.gsap && window.ScrollTrigger) {
+      this.animate();
+      this.watch();
+      return;
+    }
+    if (tries > 60) return;
+    this._t = setTimeout(() => this.waitForGsap(tries + 1), 100);
+  }
+
+  // Whatever tears the triggers down (remount, hot reload, a sibling instance),
+  // rebuild them rather than leaving the page permanently un-animated.
+  watch() {
+    clearInterval(this._watchdog);
+    this._watchdog = setInterval(() => {
+      if (this._dead || !document.getElementById('ch0')) return clearInterval(this._watchdog);
+      if (window.ScrollTrigger && ScrollTrigger.getAll().length === 0) {
+        this._animated = false;
+        this.animate();
+      }
+    }, 1200);
+  }
+
+  kill() {
+    this._animated = false;
+    if (this._dead) clearInterval(this._watchdog);
+    clearTimeout(this._t); clearTimeout(this._clock); clearTimeout(this._safety);
+    if (this._keys) { window.removeEventListener('keydown', this._keys); this._keys = null; }
+    if (this._move) { window.removeEventListener('pointermove', this._move); this._move = null; }
+    if (this._scrollBind) { window.removeEventListener('scroll', this._scrollBind); this._scrollBind = null; }
+    if (this._ticker && window.gsap) { gsap.ticker.remove(this._ticker); this._ticker = null; }
+    (this._linkCleanup || []).forEach(fn => fn());
+    this._linkCleanup = [];
+    // Only tear down what THIS instance created — a global kill would nuke a
+    // concurrently mounted instance's triggers and leave the page un-animated.
+    (this._tweens || []).forEach(t => {
+      if (t.scrollTrigger) t.scrollTrigger.kill();
+      t.kill();
+    });
+    this._tweens = [];
+    if (window.gsap) gsap.set(document.querySelectorAll('[data-anim], [data-bar], [data-bar-v], [data-row], .v5-char'), {
+      clearProps: 'opacity,transform,translate,scale,rotate,clipPath,x,y'
+    });
+  }
+
+  findScroller() {
+    let el = document.getElementById('ch0');
+    while (el && el !== document.body) {
+      const s = getComputedStyle(el);
+      if (/(auto|scroll|overlay)/.test(s.overflowY) && el.scrollHeight > el.clientHeight + 4) return el;
+      el = el.parentElement;
+    }
+    if (document.scrollingElement && document.scrollingElement.scrollHeight > window.innerHeight + 4) return window;
+    const cands = Array.from(document.querySelectorAll('body *')).filter(n => {
+      const s = getComputedStyle(n);
+      return /(auto|scroll|overlay)/.test(s.overflowY) && n.scrollHeight > n.clientHeight + 40;
+    });
+    return cands[0] || window;
+  }
+
+  ambient() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const spot = document.getElementById('v5-spot');
+    const sx = spot ? gsap.quickTo(spot, 'left', { duration: 0.55, ease: 'power3' }) : null;
+    const sy = spot ? gsap.quickTo(spot, 'top', { duration: 0.55, ease: 'power3' }) : null;
+    const mags = Array.from(document.querySelectorAll('[data-magnetic]'));
+    this._move = (e) => {
+      if (spot) { spot.style.opacity = '1'; if (sx) { sx(e.clientX); sy(e.clientY); } }
+      mags.forEach(el => {
+        const r = el.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        const near = Math.hypot(dx, dy) < Math.max(r.width, 170);
+        gsap.to(el, near
+          ? { x: dx * 0.22, y: dy * 0.3, duration: 0.45, ease: 'power3.out' }
+          : { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1,0.5)' });
+      });
+    };
+    window.addEventListener('pointermove', this._move, { passive: true });
+  }
+
+  split(h, keep) {
+    if (h.dataset.splitDone) return this.charTween(h, keep);
+    const walk = node => Array.from(node.childNodes).forEach(n => {
+      if (n.nodeType === 3 && n.textContent.trim()) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(word => {
+          if (!word.trim()) return frag.appendChild(document.createTextNode(word));
+          const w = document.createElement('span');
+          w.style.display = 'inline-block'; w.style.overflow = 'hidden'; w.style.verticalAlign = 'top';
+          word.split('').forEach(ch => {
+            const c = document.createElement('span');
+            c.className = 'v5-char'; c.style.display = 'inline-block'; c.textContent = ch;
+            w.appendChild(c);
+          });
+          frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1) walk(n);
+    });
+    walk(h);
+    h.dataset.splitDone = '1';
+    this.charTween(h, keep);
+  }
+
+  // Characters are visible by default; the entrance is a fromTo that never
+  // renders its start state until the trigger fires, so a killed or missing
+  // tween can never strand the type invisible.
+  charTween(h, keep) {
+    const chars = h.querySelectorAll('.v5-char');
+    if (!chars.length) return;
+    gsap.set(chars, { clearProps: 'opacity,transform,translate', opacity: 1 });
+    keep(gsap.fromTo(chars,
+      { yPercent: 108, opacity: 0 },
+      { yPercent: 0, opacity: 1, duration: 0.72, ease: 'expo.out', immediateRender: false,
+        stagger: { each: 0.014 },
+        scrollTrigger: { trigger: h, start: 'top 88%' } }));
+  }
+
+  animate() {
+    if (this._animated) return;
+    this._animated = true;
+    // Replace, never stack: drop anything this or a previous owner created.
+    const prev = window.__v5Owner;
+    if (prev && prev !== this && prev._tweens) {
+      prev._tweens.forEach(t => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+      prev._tweens = [];
+      prev._animated = false;
+    }
+    window.__v5Owner = this;
+    (this._tweens || []).forEach(t => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+    this._tweens = [];
+    const q = sel => Array.from(document.querySelectorAll(sel));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    gsap.registerPlugin(ScrollTrigger);
+    this._tweens = [];
+    const keep = t => { this._tweens.push(t); return t; };
+    // Content is visible by default; a reveal that never plays cannot hide it.
+    const rev = (els, from, to, opts) => {
+      const arr = (Array.isArray(els) ? els : [els]).filter(Boolean);
+      if (!arr.length) return null;
+      gsap.set(arr, { clearProps: 'opacity,transform,translate,x,y,scale,rotate' });
+      const o = opts || {};
+      return keep(gsap.fromTo(arr, from, Object.assign({ immediateRender: false, overwrite: 'auto' }, to, {
+        scrollTrigger: { trigger: o.trigger || arr[0], start: o.start || 'top 90%' }
+      })));
+    };
+    if (reduced) { gsap.set(q('[data-anim]'), { clearProps: 'all' }); return; }
+
+    this.ambient();
+    const scroller = this.findScroller();
+    this._scroller = scroller;
+    ScrollTrigger.defaults({ scroller: scroller });
+
+    clearTimeout(this._safety);
+    this._safety = setTimeout(() => {
+      q('[data-anim], [data-row], [data-bar], [data-bar-v], [data-field]').forEach(el => {
+        if (parseFloat(getComputedStyle(el).opacity) < 0.9) gsap.set(el, { opacity: 1, y: 0, x: 0, clearProps: 'clipPath,scale' });
+      });
+      q('[data-hud]').forEach(c => {
+        if (parseFloat(getComputedStyle(c).opacity) < 0.9) gsap.set(c, { opacity: 1, y: 0, clearProps: 'transform' });
+      });
+      q('.v5-char').forEach(c => {
+        if (parseFloat(getComputedStyle(c).opacity) < 0.9) gsap.set(c, { opacity: 1, yPercent: 0, clearProps: 'transform' });
+      });
+      ScrollTrigger.refresh();
+    }, 2200);
+
+    const pageTrigger = scroller === window ? document.documentElement : scroller;
+    const ladder = document.querySelector('[data-hud="ladder"]');
+    const pct = document.querySelector('[data-hud="pct"]');
+    keep(ScrollTrigger.create({
+      trigger: pageTrigger, start: 'top top', end: 'bottom bottom',
+      onUpdate: self => {
+        const p = self.progress;
+        if (ladder) ladder.style.top = (p * 100) + '%';
+        if (pct) pct.textContent = String(Math.round(p * 100)).padStart(3, '0');
+      }
+    }));
+
+    // HUD chapter readout
+    const hud = document.querySelector('[data-hud="chapter"]');
+    q('section[data-chapter]').forEach(sec => {
+      keep(ScrollTrigger.create({
+        trigger: sec, start: 'top 55%', end: 'bottom 45%',
+        onToggle: self => {
+          if (!self.isActive) return;
+          this._active = sec.id;
+          if (hud) {
+            hud.textContent = sec.dataset.chapter;
+            gsap.set(hud, { opacity: 1, clearProps: 'opacity' });
+            gsap.fromTo(hud, { y: -6 }, { y: 0, duration: 0.4, ease: 'power2.out', immediateRender: false });
+          }
+        }
+      }));
+    });
+
+    // arrival
+    const intro = keep(gsap.timeline({ defaults: { ease: 'expo.out' } }));
+    intro.fromTo(q('#ch0 [data-anim="fade"]'), { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, stagger: 0.1 }, 0.35)
+         .fromTo('[data-anim="hero-photo"]', { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 1.5, ease: 'power2.out' }, 0);
+
+    keep(gsap.to('[data-anim="hero-photo"] img', {
+      yPercent: -8, ease: 'none',
+      scrollTrigger: { trigger: '#ch0', start: 'top top', end: 'bottom top', scrub: true }
+    }));
+
+    q('[data-anim="aura"]').forEach(el => keep(gsap.to(el, {
+      yPercent: 16, opacity: 0.45, ease: 'none',
+      scrollTrigger: { trigger: el.parentElement, start: 'top top', end: 'bottom top', scrub: 0.6 }
+    })));
+
+    q('[data-split]').forEach(h => this.split(h, keep));
+
+    q('section:not(#ch0) [data-anim="fade"]').forEach(el =>
+      rev(el, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }));
+
+    // profile bars deploy left to right
+    const bars = q('[data-bar]');
+    rev(bars, { scaleX: 0 }, { scaleX: 1, duration: 0.9, stagger: 0.09, ease: 'expo.out' }, { start: 'top 85%' });
+    q('[data-anim="leg"]').forEach(el =>
+      rev(el, { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, { start: 'top 92%' }));
+
+    const vbars = q('[data-bar-v]');
+    rev(vbars, { scaleY: 0 }, { scaleY: 1, duration: 0.7, stagger: 0.04, ease: 'expo.out' }, { start: 'top 88%' });
+
+    // product screens arrive with perspective and drift on scrub
+    q('[data-anim="report"]').forEach(el => {
+      rev(el, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.9, ease: 'expo.out' }, { start: 'top 88%' });
+      rev(Array.from(el.querySelectorAll('[data-field]')), { opacity: 0, x: 12 },
+        { opacity: 1, x: 0, duration: 0.5, stagger: 0.09, ease: 'power3.out' }, { trigger: el, start: 'top 84%' });
+    });
+
+    q('[data-anim="screen"]').forEach(el => {
+      rev(el, { opacity: 0, y: 46, rotateX: 7, scale: 0.97, transformPerspective: 1400 },
+        { opacity: 1, y: 0, rotateX: 0, scale: 1, duration: 1.1, ease: 'expo.out' }, { start: 'top 86%' });
+      keep(gsap.fromTo(el, { yPercent: 3 }, {
+        yPercent: -3, ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.8 }
+      }));
+      const rows = Array.from(el.querySelectorAll('[data-row]'));
+      rev(rows, { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.07, ease: 'power3.out' }, { trigger: el, start: 'top 80%' });
+    });
+
+    // checklist stamps
+    const groups = new Map();
+    q('[data-anim="check"]').forEach(el => {
+      const p = el.parentElement;
+      if (!groups.has(p)) groups.set(p, []);
+      groups.get(p).push(el);
+    });
+    groups.forEach(items => {
+      rev(items, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }, { start: 'top 92%' });
+      rev(items.map(i => i.firstElementChild), { scale: 0.2, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.42, stagger: 0.08, ease: 'back.out(2.6)' }, { trigger: items[0], start: 'top 92%' });
+    });
+
+    rev(q('[data-anim="stat"] > div:first-child'), { yPercent: 40, opacity: 0 },
+      { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.08, ease: 'expo.out' },
+      { trigger: document.querySelector('[data-anim="stat"]'), start: 'top 88%' });
+
+    q('[data-count]').forEach(el => {
+      const end = parseFloat(el.dataset.count);
+      const dec = parseInt(el.dataset.countDecimals || '0', 10);
+      const obj = { v: 0 };
+      keep(gsap.to(obj, {
+        v: end, duration: 1.5, ease: 'power2.out',
+        onUpdate: () => { el.textContent = obj.v.toFixed(dec); },
+        scrollTrigger: { trigger: el, start: 'top 92%' }
+      }));
+    });
+
+    q('#ch6 a').forEach(a => {
+      const over = () => gsap.to(a, { x: 8, duration: 0.35, ease: 'power3.out' });
+      const out = () => gsap.to(a, { x: 0, duration: 0.5, ease: 'power2.out' });
+      a.addEventListener('pointerenter', over);
+      a.addEventListener('pointerleave', out);
+      this._linkCleanup.push(() => { a.removeEventListener('pointerenter', over); a.removeEventListener('pointerleave', out); });
+    });
+
+    // Triggers can be (re)built before layout settles, or after a rebuild whose
+    // scroll binding is stale — drive updates off real scroll/load events.
+    if (this._scrollBind) window.removeEventListener('scroll', this._scrollBind);
+    this._scrollBind = () => ScrollTrigger.update();
+    window.addEventListener('scroll', this._scrollBind, { passive: true });
+    if (this._ticker) gsap.ticker.remove(this._ticker);
+    this._lastY = -1;
+    this._ticker = () => {
+      const y = window.scrollY || document.scrollingElement.scrollTop || 0;
+      if (y !== this._lastY) { this._lastY = y; ScrollTrigger.update(); }
+    };
+    gsap.ticker.add(this._ticker);
+    const settle = () => { ScrollTrigger.refresh(); ScrollTrigger.update(); };
+    settle();
+    requestAnimationFrame(settle);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle);
+    window.addEventListener('load', settle, { once: true });
+    setTimeout(settle, 900);
+  }
+
+  renderVals() {
+    return {
+      showConsole: this.props.showConsole ?? true,
+      showProfile: this.props.showProfile ?? true,
+      lines: this.state.lines,
+      soundLabel: this.state.sound ? 'on' : 'off',
+      onSound: (e) => { e.preventDefault(); this.toggleSound(); },
+      onChip: (e) => { e.preventDefault(); this.run(e.currentTarget.dataset.cmd); },
+      onSubmit: (e) => {
+        e.preventDefault();
+        const v = this._input ? this._input.value : '';
+        if (this._input) this._input.value = '';
+        this.run(v);
+      },
+      inputRef: (el) => { this._input = el; }
+    };
+  }
+}
+</script>
+</body>
+</html>
