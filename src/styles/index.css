@@ -11,11 +11,18 @@
   --color-bone: #fbf7f1;
   --color-body: #efe6da;
   --color-muted: #b8aaa0;
-  --color-dim-0: #9c8c7e;
-  --color-dim-1: #8a7a6d;
-  --color-dim-2: #7e6f63;
-  --color-dim-3: #6e6058;
-  --color-dim-4: #5f534b;
+  /* The dim ladder is tuned so every step clears WCAG AA (4.5:1) against
+     --color-deck, because these tokens carry the smallest type on the page.
+     Ratios, deck-relative: 7.0 / 6.1 / 5.4 / 4.8 / 4.6. The hue is the
+     original warm grey (#7e6f63) scaled in luminance, so the deck's colour
+     cast is unchanged. Hierarchy below dim-2 comes from size and weight,
+     not further darkening: five perceptible steps cannot all clear AA on a
+     near-black ground. */
+  --color-dim-0: #a99585;
+  --color-dim-1: #9d8b7c;
+  --color-dim-2: #938274;
+  --color-dim-3: #8a796c;
+  --color-dim-4: #86766a;
   --color-go: #8fb877;
   --color-horizon: #8a9fb8;
 
@@ -25,6 +32,16 @@
 }
 
 @layer base {
+  :root {
+    /* Resting height of the fixed command console (Console.tsx): the input
+       row, with an empty scrollback above it. Chapters subtract it from their
+       min-height so that `items-center` centres their content in the area the
+       visitor can actually see, instead of centring in the full viewport and
+       tucking the last line or two underneath the bar. The scrollback can
+       grow to 150px on top of this, but only while the visitor is actively
+       typing commands. */
+    --console-rest-h: 58px;
+  }
   body {
     margin: 0;
     background: var(--color-deck);

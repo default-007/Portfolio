@@ -45,7 +45,7 @@ const SAYS: Record<string, { text: string; color: string }> = {
     color: COLORS.muted,
   },
   whoami: {
-    text: 'brian otieno — full-stack engineer, nairobi. 5 yr logged. aviation before software.',
+    text: 'brian otieno: full-stack engineer, nairobi. 5 yr logged. aviation before software.',
     color: COLORS.muted,
   },
   stats: {
@@ -65,5 +65,5 @@ export function parseCommand(raw: string): CommandResult {
   if (cmd === 'sound') return { kind: 'toggleSound' };
   if (cmd === 'resume') return { kind: 'openResume' };
 
-  return { kind: 'say', text: `unknown command: ${cmd} — try help`, color: COLORS.warn };
+  return { kind: 'say', text: `unknown command: ${cmd}, try help`, color: COLORS.warn };
 }

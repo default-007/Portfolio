@@ -51,7 +51,7 @@ export function Clearance() {
       id="ch6"
       data-chapter={chapter.hudLabel}
       data-screen-label={chapter.screenLabel}
-      className="relative grid min-h-screen items-center gap-[52px] overflow-hidden pr-10 pb-[130px] pl-[76px] pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))]"
+      className="relative grid min-h-[calc(100dvh-var(--console-rest-h))] items-center gap-[52px] overflow-hidden pr-5 pb-[130px] pl-[64px] md:pr-10 md:pl-[76px] pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))]"
     >
       <div
         data-anim="aura"
@@ -69,17 +69,10 @@ export function Clearance() {
       />
 
       <div className="relative z-[1]">
-        <div
-          data-anim="fade"
-          className="mb-[22px] font-mono text-[10.5px] uppercase tracking-[0.18em] text-dim-2"
-        >
-          Leg 06 · clearance to contact
-        </div>
-
         <h3
           ref={headingRef}
           data-split="1"
-          className="m-0 mb-[22px] font-display text-[clamp(32px,5vw,78px)] font-extralight leading-none tracking-[-0.035em] text-bone [text-wrap:pretty]"
+          className="m-0 mb-[22px] font-display text-[clamp(32px,5vw,78px)] font-light leading-none tracking-[-0.035em] text-bone [text-wrap:pretty]"
         >
           Cleared for departure.
         </h3>

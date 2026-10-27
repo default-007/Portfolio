@@ -98,13 +98,14 @@ describe('Spotlight', () => {
     expect(removeCall![1]).toBe(registeredListener);
   });
 
-  it('wires quickTo tweens for left and top with the design-ported duration and ease', () => {
+  it('wires quickTo tweens for x and y with the design-ported duration and ease', () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }) as MediaQueryList);
 
     render(<Spotlight />);
 
     const quickTo = gsap.quickTo as unknown as MockInstance;
-    expect(quickTo).toHaveBeenCalledWith(expect.anything(), 'left', { duration: 0.55, ease: 'power3' });
-    expect(quickTo).toHaveBeenCalledWith(expect.anything(), 'top', { duration: 0.55, ease: 'power3' });
+    // 'x'/'y', not the design's 'left'/'top': see the note in Spotlight.tsx.
+    expect(quickTo).toHaveBeenCalledWith(expect.anything(), 'x', { duration: 0.55, ease: 'power3' });
+    expect(quickTo).toHaveBeenCalledWith(expect.anything(), 'y', { duration: 0.55, ease: 'power3' });
   });
 });

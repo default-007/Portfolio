@@ -19,8 +19,13 @@ export function Spotlight() {
     const el = ref.current;
     if (!el) return;
 
-    const moveX = gsap.quickTo(el, 'left', { duration: 0.55, ease: 'power3' });
-    const moveY = gsap.quickTo(el, 'top', { duration: 0.55, ease: 'power3' });
+    // The design eases 'left'/'top'. Both are layout properties, so tweening
+    // them ran layout and paint for a 720px element on every pointer frame.
+    // 'x'/'y' are transforms, so this composites instead, and the result is
+    // geometrically identical: the element is anchored at top/left 0 and
+    // centred on the cursor by its own negative margin either way.
+    const moveX = gsap.quickTo(el, 'x', { duration: 0.55, ease: 'power3' });
+    const moveY = gsap.quickTo(el, 'y', { duration: 0.55, ease: 'power3' });
 
     const onPointerMove = (e: PointerEvent) => {
       el.style.opacity = '1';

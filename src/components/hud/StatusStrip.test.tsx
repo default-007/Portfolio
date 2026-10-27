@@ -1,17 +1,12 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { StatusStrip } from './StatusStrip';
-
-afterEach(() => {
-  vi.useRealTimers();
-  vi.unstubAllGlobals();
-});
 
 describe('StatusStrip', () => {
   it('shows the availability notice and location', () => {
     render(<StatusStrip activeChapterLabel="00 · Arrival" />);
     expect(screen.getByText('Available for assignment')).toBeInTheDocument();
-    expect(screen.getByText('NBO · UTC+3')).toBeInTheDocument();
+    expect(screen.getByText('Nairobi · UTC+3')).toBeInTheDocument();
   });
 
   it('shows the active chapter label', () => {
@@ -19,25 +14,23 @@ describe('StatusStrip', () => {
     expect(screen.getByText('03 · WaterWatch')).toBeInTheDocument();
   });
 
-  it('ticks the clock every second in 24-hour format', () => {
-    const toLocaleTimeStringSpy = vi.spyOn(Date.prototype, 'toLocaleTimeString');
-    try {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date('2026-09-04T14:30:05Z'));
-      render(<StatusStrip activeChapterLabel="00 · Arrival" />);
-      act(() => { vi.advanceTimersByTime(1000); });
-      expect(screen.getByTestId('hud-clock').textContent).toMatch(/^\d{2}:\d{2}:\d{2}$/);
-      expect(toLocaleTimeStringSpy).toHaveBeenCalledWith('en-GB', { hour12: false });
-    } finally {
-      toLocaleTimeStringSpy.mockRestore();
-    }
+  // The design's ticking clock and blinking availability lamp are both gone
+  // on purpose (see StatusStrip.tsx). Asserted rather than merely deleted:
+  // a per-second interval in a component this high in the tree is the kind
+  // of thing that gets re-added as "atmosphere" without anyone noticing the
+  // re-render cost.
+  it('renders no clock and holds no interval', () => {
+    const { container, unmount } = render(<StatusStrip activeChapterLabel="00 · Arrival" />);
+    expect(screen.queryByTestId('hud-clock')).toBeNull();
+    expect(container.textContent).not.toMatch(/\d{2}:\d{2}:\d{2}/);
+    unmount();
   });
 
-  it('suppresses the status dot animation under reduced motion', () => {
-    vi.stubGlobal('matchMedia', () => ({ matches: true }) as MediaQueryList);
+  it('lights the availability lamp without animating it', () => {
     render(<StatusStrip activeChapterLabel="00 · Arrival" />);
-    const dot = screen.getByText('Available for assignment').parentElement?.querySelector('span:first-child > span');
+    const dot = screen.getByText('Available for assignment').querySelector('span');
     expect(dot).not.toBeNull();
+    expect(dot?.className).toContain('bg-go');
     expect(dot?.className).not.toContain('deck-blink');
   });
 });

@@ -60,8 +60,8 @@ describe('Clearance', () => {
     const lines = block.innerHTML.split('<br>');
 
     expect(lines.map((line) => line.replace(/<[^>]+>/g, ''))).toEqual([
-      'MSc Computing &amp; Information Systems — Strathmore (in progress)',
-      'Data Science &amp; ML — MIT · Software Development — Moringa · BSc Civil Aviation — Moi',
+      'MSc Computing &amp; Information Systems, Strathmore (in progress)',
+      'Data Science &amp; ML, MIT · Software Development, Moringa · BSc Civil Aviation, Moi',
       'AWS Cloud Practitioner · Cisco CCNA (in progress)',
     ]);
 

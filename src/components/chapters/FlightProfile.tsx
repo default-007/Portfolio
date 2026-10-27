@@ -20,7 +20,7 @@ function StatTile({ stat, isFirst }: { stat: Stat; isFirst: boolean }) {
         <span ref={countRef}>{stat.value.toFixed(stat.decimals ?? 0)}</span>
         {stat.suffix}
       </div>
-      <div className="mt-[7px] font-mono text-[10.5px] leading-[1.7] text-dim-1">
+      <div className="mt-[7px] font-mono text-[11.5px] leading-[1.7] text-dim-1">
         {stat.label.split('\n').map((line, i) => (
           <Fragment key={i}>
             {i > 0 && <br />}
@@ -45,28 +45,28 @@ export function FlightProfile() {
       id="ch1"
       data-chapter="01 · Flight profile"
       data-screen-label="01"
-      className="relative flex min-h-screen flex-col justify-center gap-[34px] border-b border-body/10 bg-deck-raised pb-[120px] pl-[76px] pr-10 pt-[78px]"
+      className="relative flex min-h-[calc(100dvh-var(--console-rest-h))] flex-col justify-center gap-[26px] border-b border-body/10 bg-deck-raised pb-[120px] pl-[64px] pr-5 md:pl-[76px] md:pr-10 pt-[78px]"
     >
       <div
         data-anim="fade"
-        className="flex flex-wrap items-baseline justify-between gap-[10px] border-b border-body/12 pb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-dim-2"
+        className="flex flex-wrap items-baseline justify-between gap-[10px] border-b border-body/12 pb-3 font-mono text-[11px] uppercase tracking-[0.12em] text-dim-2"
       >
-        <span className="whitespace-nowrap text-ember">Flight profile · 2018 — 2026</span>
+        <span className="whitespace-nowrap text-ember">Flight profile · 2018-2026</span>
         <span className="whitespace-nowrap">6 legs logged</span>
       </div>
 
       <h2
         ref={headingRef}
         data-split="1"
-        className="m-0 max-w-[900px] font-display text-[clamp(30px,4.4vw,64px)] font-extralight leading-[1.04] tracking-[-0.03em] text-bone [text-wrap:pretty]"
+        className="m-0 max-w-[900px] font-display text-[clamp(28px,3.6vw,52px)] font-light leading-[1.04] tracking-[-0.03em] text-bone [text-wrap:pretty]"
       >
         Aviation, then fintech, then GIS, then ERP. The altitude only went one way.
       </h2>
 
       <div className="flex flex-col gap-0 border-t border-body/10">
-        <div className="grid grid-cols-[190px_minmax(0,1fr)_96px] gap-[18px] py-[11px] font-mono text-[9.5px] uppercase tracking-[0.16em] text-dim-4">
+        <div className="grid grid-cols-[minmax(0,1fr)_72px] md:grid-cols-[230px_minmax(0,1fr)_96px] gap-[18px] py-[11px] font-mono text-[11px] uppercase tracking-[0.11em] text-dim-4">
           <span>Operator</span>
-          <span className="grid grid-cols-9">
+          <span className="hidden grid-cols-9 md:grid">
             {YEARS.map((year) => (
               <span key={year}>{year}</span>
             ))}
@@ -78,16 +78,16 @@ export function FlightProfile() {
           <div
             key={leg.company}
             data-anim="leg"
-            className="grid grid-cols-[190px_minmax(0,1fr)_96px] items-center gap-[18px] border-t border-body/7 py-[13px] transition-colors duration-[350ms] hover:bg-ember/5"
+            className="grid grid-cols-[minmax(0,1fr)_72px] md:grid-cols-[230px_minmax(0,1fr)_96px] items-center gap-[18px] border-t border-body/7 py-[13px] transition-colors duration-[350ms] hover:bg-ember/5"
           >
             <div className="text-[13.5px] text-bone">
               {leg.company}
-              <div className="mt-0.5 font-mono text-[10.5px] text-dim-1">
+              <div className="mt-0.5 font-mono text-[11.5px] text-dim-1">
                 {leg.role}
                 <span className="mt-0.5 block text-dim-3">{leg.detail}</span>
               </div>
             </div>
-            <div className="relative grid h-[26px] grid-cols-9">
+            <div className="relative hidden h-[26px] grid-cols-9 md:grid">
               <div
                 data-bar="1"
                 className="h-[26px] overflow-hidden whitespace-nowrap"
@@ -98,7 +98,7 @@ export function FlightProfile() {
                 }}
               />
             </div>
-            <div className="text-right font-mono text-[10.5px] text-dim-3">{leg.sector}</div>
+            <div className="text-right font-mono text-[11.5px] text-dim-3">{leg.sector}</div>
           </div>
         ))}
       </div>

@@ -6,7 +6,7 @@ import { CHAPTER_IDS } from '../data/chapters';
 type WebkitWindow = typeof window & { webkitAudioContext?: typeof AudioContext };
 
 const CHIP_CLASS =
-  'appearance-none whitespace-nowrap border border-body/16 bg-transparent px-[10px] py-[6px] font-mono text-[10px] uppercase tracking-[0.12em] text-dim-1 hover:border-ember/50 hover:text-ember';
+  'appearance-none whitespace-nowrap border border-body/16 bg-transparent px-[10px] py-[6px] font-mono text-[11px] uppercase tracking-[0.12em] text-dim-1 hover:border-ember/50 hover:text-ember';
 
 // Ported from design source (portfolio-v5-flight-deck.dc.html lines 53-72):
 // a command line fixed to the bottom of every screen, above the HUD chrome
@@ -141,7 +141,7 @@ export function Console({
         <input
           ref={inputRef}
           aria-label="Flight deck command line"
-          placeholder="type help — or press / anywhere"
+          placeholder="type help, or press / anywhere"
           className="min-w-[60px] flex-1 appearance-none border-none bg-transparent p-0 font-mono text-[13px] text-bone caret-ember outline-none"
         />
         <div className="flex flex-none flex-nowrap gap-[6px] overflow-hidden">

@@ -24,7 +24,7 @@ code, no API calls, no runtime environment variables.
 ```bash
 npm install
 npm run dev        # Vite dev server
-npx vitest run     # 186 tests across 25 files
+npx vitest run     # 182 tests across 25 files
 npm run build      # tsc --noEmit → vite build → build-output guards
 npm run preview    # serve the production build locally
 ```
@@ -35,24 +35,24 @@ resume, htaccess. If it does not, the build is not deployable.
 
 ## Layout
 
-| Path | Responsibility |
-| --- | --- |
-| `index.html` | Shell, font preconnects, `<noscript>` route to the résumé |
-| `src/main.tsx` | React root |
-| `src/App.tsx` | Chapter composition + global chrome |
-| `src/styles/` | `index.css` (Tailwind import, `@theme` tokens), `atmosphere.css` |
-| `src/data/` | All copy, as typed modules — chapters, experience, projects, checklist, contact |
-| `src/console/` | Command parser, state reducer, console UI |
-| `src/components/hud/` | Status strip, altitude ladder, corner brackets |
-| `src/components/atmosphere/` | Grain, vignette, cursor spotlight, WebGL ember field |
-| `src/components/chapters/` | One component per chapter, plus three bespoke project mockups |
-| `src/motion/` | Lenis↔ScrollTrigger bridge, reveal / split-text / counter / magnetic hooks |
-| `src/lib/env.ts` | Reduced-motion and WebGL capability checks |
-| `public/resume.html` | Standalone, dependency-free résumé page |
-| `public/.htaccess` | Compression and cache headers |
-| `scripts/` | Build-output guards (`check-bundle.mjs`, `htaccessGuard.mjs`) |
-| `design/` | Vendored design sources — the authority for markup, copy and style values |
-| `docs/` | Design spec and implementation plan |
+| Path                         | Responsibility                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| `index.html`                 | Shell, font preconnects,`<noscript>` route to the résumé                        |
+| `src/main.tsx`               | React root                                                                      |
+| `src/App.tsx`                | Chapter composition + global chrome                                             |
+| `src/styles/`                | `index.css` (Tailwind import, `@theme` tokens), `atmosphere.css`                |
+| `src/data/`                  | All copy, as typed modules — chapters, experience, projects, checklist, contact |
+| `src/console/`               | Command parser, state reducer, console UI                                       |
+| `src/components/hud/`        | Status strip, altitude ladder, corner brackets                                  |
+| `src/components/atmosphere/` | Grain, vignette, cursor spotlight, WebGL ember field                            |
+| `src/components/chapters/`   | One component per chapter, plus three bespoke project mockups                   |
+| `src/motion/`                | Lenis↔ScrollTrigger bridge, reveal / split-text / counter / magnetic hooks      |
+| `src/lib/env.ts`             | Reduced-motion and WebGL capability checks                                      |
+| `public/resume.html`         | Standalone, dependency-free résumé page                                         |
+| `public/.htaccess`           | Compression and cache headers                                                   |
+| `scripts/`                   | Build-output guards (`check-bundle.mjs`, `htaccessGuard.mjs`)                   |
+| `design/`                    | Vendored design sources — the authority for markup, copy and style values       |
+| `docs/`                      | Design spec and implementation plan                                             |
 
 ## Load-bearing constraints
 
@@ -62,17 +62,17 @@ These are not preferences; changing one breaks something specific.
   shared hosting. Every reference in `dist/index.html` must stay relative so
   the bundle works from a domain root or a subdirectory alike.
 - **three.js is lazy and desktop-only.** It is ~240 kB gzipped and must be
-  reachable *only* through `EmberField`'s dynamic import. `manualChunks` in
+  reachable _only_ through `EmberField`'s dynamic import. `manualChunks` in
   `vite.config.ts` is in function form for this reason; the object form once
   swept React's JSX runtime into the three chunk, which put three into the
   entry's static graph for every visitor. `scripts/check-bundle.mjs` asserts
   the edge is absent, because no unit test can see it.
 - **Content is visible by default.** Every scroll reveal is a GSAP `fromTo`
-  with `immediateRender: false`. Nothing animates *from* a hidden state, so a
+  with `immediateRender: false`. Nothing animates _from_ a hidden state, so a
   device that never runs the animations still shows the whole page.
 - **`prefers-reduced-motion: reduce` disables motion, not information.** Grain,
   spotlight, aura drift, `EmberField` and all entrance animations go; the
-  clock, chapter readout and altitude ladder keep updating.
+  chapter readout and altitude ladder keep updating.
 - **Copy is never invented.** All text comes from `design/` verbatim, via the
   typed modules in `src/data/`. Link targets are the documented exception —
   they are build artifacts, not copy (see the note in `src/data/contact.ts`).
@@ -88,16 +88,16 @@ These are not preferences; changing one breaks something specific.
 The console is a command line fixed to the bottom of the viewport; `help` or
 `?` lists the commands.
 
-| Command | Effect |
-| --- | --- |
-| `help`, `?` | List commands |
-| `ls` | List the seven chapters |
-| `whoami`, `stats` | Print the summary lines |
-| `top`, `profile`, `cbc`, `waterwatch`, `ticketing`, `checklist`, `incident`, `hire`, `contact` | Route to a chapter |
-| `open 00`–`open 06` | Route by number |
-| `resume` | Open `./resume.html` |
-| `sound` | Toggle sound |
-| `clear` | Clear the log |
+| Command                                                                                        | Effect                  |
+| ---------------------------------------------------------------------------------------------- | ----------------------- |
+| `help`, `?`                                                                                    | List commands           |
+| `ls`                                                                                           | List the seven chapters |
+| `whoami`, `stats`                                                                              | Print the summary lines |
+| `top`, `profile`, `cbc`, `waterwatch`, `ticketing`, `checklist`, `incident`, `hire`, `contact` | Route to a chapter      |
+| `open 00`–`open 06`                                                                            | Route by number         |
+| `resume`                                                                                       | Open`./resume.html`     |
+| `sound`                                                                                        | Toggle sound            |
+| `clear`                                                                                        | Clear the log           |
 
 Routing goes through Lenis' `scrollTo`, so console navigation and scrolling
 share one motion system.
@@ -128,8 +128,11 @@ strands a stale `.htaccess`, are in [DEPLOY.md](DEPLOY.md).
 
 ## Open item
 
-Chapter 05's occurrence report ships with placeholder copy: its four fields are
-prompts addressed to Brian, not finished content (spec §12.3). The layout is
-real and the text is a one-line swap in `src/data/checklist.ts` — flip
-`REPORT_IS_PLACEHOLDER` and fill `REPORT_FIELDS` when the answers arrive. No
-failure will be invented to fill it.
+Chapter 05's occurrence report is not rendered. Its four fields were never
+filled in, so the deployed page was showing the design's own prompts to Brian
+("Awaiting your account...", "Send me the four answers and I'll set this in
+type") as though they were body copy, which reads as unfinished and is
+addressed to the wrong reader. The panel's markup is still in
+`design/portfolio-v5-flight-deck.dc.html` and in the git history of
+`src/components/chapters/Checklist.tsx`; restoring it is a copy change once a
+real incident account exists. No failure will be invented to fill it.

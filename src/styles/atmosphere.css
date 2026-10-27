@@ -45,6 +45,8 @@
   z-index: 6;
   opacity: 0;
   transition: opacity 0.8s ease;
+  /* Paired with the x/y tween in Spotlight.tsx. */
+  will-change: transform;
   background: radial-gradient(
     circle,
     rgba(232, 163, 61, 0.12) 0%,

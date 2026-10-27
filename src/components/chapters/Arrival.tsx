@@ -25,7 +25,7 @@ export function Arrival() {
       id="ch0"
       data-chapter="00 · Arrival"
       data-screen-label="00"
-      className="relative grid min-h-screen items-center overflow-hidden border-b border-body/10 pb-[120px] pl-[76px] pr-10 pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))] gap-10"
+      className="relative grid min-h-[calc(100dvh-var(--console-rest-h))] items-center overflow-hidden border-b border-body/10 pb-[120px] pl-[64px] pr-5 md:pl-[76px] md:pr-10 pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))] gap-10"
     >
       {/* The aura lives in HeroAtmosphere, which renders the design's CSS
           layer and swaps in the WebGL ember field only where the device can
@@ -37,9 +37,9 @@ export function Arrival() {
       <div className="relative z-[1]">
         <div
           data-anim="fade"
-          className="mb-[34px] flex w-max max-w-full overflow-hidden whitespace-nowrap border border-body/14 font-mono text-[10px] uppercase tracking-[0.14em] text-dim-2"
+          className="mb-[34px] flex w-max max-w-full flex-wrap whitespace-nowrap border border-body/14 font-mono text-[11px] uppercase tracking-[0.1em] text-dim-2"
         >
-          <span className="border-r border-body/14 px-3 py-2">Reg. 5Y—BOO</span>
+          <span className="border-r border-body/14 px-3 py-2">Reg. 5Y-BOO</span>
           <span className="border-r border-body/14 px-3 py-2">Full-stack engineer</span>
           <span className="px-3 py-2 text-ember">5 yr + logged</span>
         </div>
@@ -47,10 +47,10 @@ export function Arrival() {
         <h1
           ref={headingRef}
           data-split="1"
-          className="m-0 mb-7 font-display text-[clamp(44px,7.6vw,124px)] font-extralight leading-[0.9] tracking-[-0.04em] text-bone [text-shadow:0_0_70px_rgba(232,163,61,0.14)]"
+          className="m-0 mb-7 font-display text-[clamp(40px,5.4vw,78px)] font-light md:font-extralight leading-[0.9] tracking-[-0.04em] text-bone"
         >
           Brian Otieno<br />{' '}
-          <span className="italic text-ember [text-shadow:0_0_36px_rgba(232,163,61,0.5),0_0_100px_rgba(192,96,58,0.35)]">
+          <span className="italic text-ember">
             certifies
           </span>{' '}
           systems<br />{' '}
@@ -61,8 +61,8 @@ export function Arrival() {
           data-anim="fade"
           className="m-0 mb-[30px] max-w-[600px] font-display text-[19.5px] leading-[1.6] text-muted [text-wrap:pretty]"
         >
-          Civil aviation before software. Aviation taught me that procedure is not bureaucracy —
-          it is the thing standing between a checklist and a headline. I build ERP, school, and
+          Civil aviation before software. Aviation taught me that procedure is not bureaucracy.
+          It is the thing standing between a checklist and a headline. I build ERP, school, and
           geospatial systems the same way: restorable, reversible, auditable.
         </p>
 
@@ -71,7 +71,7 @@ export function Arrival() {
             ref={primaryCtaRef}
             href="#ch2"
             data-magnetic="1"
-            className="bg-rust px-6 py-[14px] font-mono text-[12px] uppercase tracking-[0.12em] text-bone hover:bg-rust-bright hover:shadow-[0_14px_46px_rgba(192,96,58,0.5)]"
+            className="bg-rust px-6 py-[14px] font-mono text-[12px] uppercase tracking-[0.12em] text-bone hover:bg-rust-bright hover:shadow-[0_8px_22px_rgba(96,38,20,0.55)]"
             style={{ transition: 'background .3s, box-shadow .4s' }}
           >
             Walk the deck →
@@ -80,14 +80,11 @@ export function Arrival() {
             ref={secondaryCtaRef}
             href="mailto:brianokola@gmail.com"
             data-magnetic="1"
-            className="border border-body/24 px-6 py-[14px] font-mono text-[12px] uppercase tracking-[0.12em] text-body hover:border-ember hover:text-ember hover:shadow-[0_14px_46px_rgba(232,163,61,0.22)]"
+            className="border border-body/24 px-6 py-[14px] font-mono text-[12px] uppercase tracking-[0.12em] text-body hover:border-ember hover:text-ember hover:shadow-[0_8px_22px_rgba(70,48,18,0.5)]"
             style={{ transition: 'border-color .3s, box-shadow .4s' }}
           >
             Request contact
           </a>
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-dim-3">
-            or press <span className="text-ember">/</span> to fly it by keyboard
-          </span>
         </div>
       </div>
 
@@ -121,25 +118,6 @@ export function Arrival() {
               'linear-gradient(180deg, rgba(232,163,61,0) 0%, rgba(232,163,61,0.14) 50%, rgba(232,163,61,0) 100%)',
           }}
         />
-        <div
-          aria-hidden="true"
-          className="absolute right-3 top-3 h-[50px] w-[50px] overflow-hidden rounded-full border border-ember/32"
-        >
-          <div
-            className={`absolute inset-0${reduced ? '' : ' animate-[deck-sweep_3.6s_linear_infinite]'}`}
-            style={{
-              background:
-                'conic-gradient(from 0deg, rgba(232,163,61,0.55) 0deg, rgba(232,163,61,0) 90deg)',
-            }}
-          />
-          <div
-            className={`absolute inset-[44%] rounded-full bg-ember${reduced ? '' : ' animate-[deck-blink_2.4s_infinite]'}`}
-          />
-        </div>
-        <div className="absolute inset-x-3 bottom-3 flex justify-between font-mono text-[9.5px] tracking-[0.1em] text-body/66">
-          <span>PHOTO / OTIENO_B</span>
-          <span>NBO</span>
-        </div>
       </div>
     </section>
   );

@@ -49,7 +49,7 @@ describe('parseCommand', () => {
   it('answers whoami with prose', () => {
     expect(parseCommand('whoami')).toEqual({
       kind: 'say',
-      text: 'brian otieno — full-stack engineer, nairobi. 5 yr logged. aviation before software.',
+      text: 'brian otieno: full-stack engineer, nairobi. 5 yr logged. aviation before software.',
       color: '#B8AAA0',
     });
   });
@@ -80,7 +80,7 @@ describe('parseCommand', () => {
     const result = parseCommand('launch');
     expect(result).toEqual({
       kind: 'say',
-      text: 'unknown command: launch — try help',
+      text: 'unknown command: launch, try help',
       color: '#C0603A',
     });
   });
@@ -88,12 +88,12 @@ describe('parseCommand', () => {
   it('rejects prototype chain pollution (constructor, toString)', () => {
     expect(parseCommand('constructor')).toEqual({
       kind: 'say',
-      text: 'unknown command: constructor — try help',
+      text: 'unknown command: constructor, try help',
       color: '#C0603A',
     });
     expect(parseCommand('toString')).toEqual({
       kind: 'say',
-      text: 'unknown command: tostring — try help',
+      text: 'unknown command: tostring, try help',
       color: '#C0603A',
     });
   });

@@ -20,7 +20,7 @@ export function AltitudeLadder({ progress }: { progress: number }) {
           style={{ top: `${progress * 100}%` }}
         />
       </div>
-      <div className="mt-[16px] font-mono text-[10px] tracking-[0.14em] text-dim-2">{pct}</div>
+      <div className="mt-[16px] font-mono text-[11px] tracking-[0.1em] text-dim-2">{pct}</div>
     </div>
   );
 }

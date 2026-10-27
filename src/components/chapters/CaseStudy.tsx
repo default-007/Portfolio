@@ -53,7 +53,7 @@ export function CaseStudy({
     <div>
       <div
         data-anim="fade"
-        className={`mb-5 font-mono text-[10.5px] uppercase tracking-[0.18em] ${LEG_ACCENT_CLASS[project.id]}`}
+        className={`mb-5 font-mono text-[11.5px] uppercase tracking-[0.12em] ${LEG_ACCENT_CLASS[project.id]}`}
       >
         {project.leg}
       </div>
@@ -61,7 +61,7 @@ export function CaseStudy({
       <h3
         ref={headingRef}
         data-split="1"
-        className="m-0 mb-5 font-display text-[clamp(32px,4.6vw,72px)] font-extralight leading-none tracking-[-0.03em] text-bone"
+        className="m-0 mb-5 font-display text-[clamp(32px,4.6vw,72px)] font-light leading-none tracking-[-0.03em] text-bone"
       >
         {project.title}
       </h3>
@@ -101,7 +101,7 @@ export function CaseStudy({
       id={project.id}
       data-chapter={chapter.hudLabel}
       data-screen-label={chapter.screenLabel}
-      className={`relative grid min-h-screen items-center gap-12 border-b border-body/10 pb-[120px] pl-[76px] pr-10 pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr))]${
+      className={`relative grid min-h-[calc(100dvh-var(--console-rest-h))] items-center gap-12 border-b border-body/10 pb-[120px] pl-[64px] pr-5 md:pl-[76px] md:pr-10 pt-[78px] [grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr))]${
         raised ? ' bg-deck-raised' : ''
       }`}
     >

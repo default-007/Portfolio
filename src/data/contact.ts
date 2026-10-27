@@ -17,10 +17,10 @@ export const CONTACT: readonly ContactRow[] = [
 ] as const;
 
 export const EDUCATION: readonly string[] = [
-  'MSc Computing & Information Systems — Strathmore (in progress)',
-  'Data Science & ML — MIT',
-  'Software Development — Moringa',
-  'BSc Civil Aviation — Moi',
+  'MSc Computing & Information Systems, Strathmore (in progress)',
+  'Data Science & ML, MIT',
+  'Software Development, Moringa',
+  'BSc Civil Aviation, Moi',
 ] as const;
 
 export const CERTIFICATIONS: readonly string[] = [
